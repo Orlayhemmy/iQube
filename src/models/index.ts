@@ -16,3 +16,4 @@ mongoose.connection.on('err', err => {
 });
 
 export { default as Device } from './Device';
+export { default as User } from './User';
