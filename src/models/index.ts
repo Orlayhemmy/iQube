@@ -1,4 +1,6 @@
 import * as mongoose from 'mongoose';
+import * as dotenv from 'dotenv';
+dotenv.config({ path: 'application.env' });
 
 const options = {
   reconnectTries: Number.MAX_VALUE,
@@ -17,3 +19,4 @@ mongoose.connection.on('err', err => {
 
 export { default as Device } from './Device';
 export { default as User } from './User';
+export { default as Log } from './Log';
