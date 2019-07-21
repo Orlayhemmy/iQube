@@ -67,3 +67,37 @@ export const deviceBinding = async (req: Request, res: Response) => {
     message: `You already have 5 devices bounded to this account, please unbind one to add this`
   });
 };
+
+export const login = async (req: Request, res: Response) => {
+  let inputs = ['deviceID', 'userID'];
+  let err = validator(inputs, req.body);
+  if (err.length >= 1)
+    return res.status(401).json({ status: 401, message: err });
+
+  // first find user. if no user, they've not binded
+  const user = await db.User.findOne({ userID: req.body.userID });
+  if (!user)
+    return res
+      .status(401)
+      .json({ status: 401, message: `Please bind this device to continue` });
+
+  const userDevices = await db.Device.findOne({
+    user: user._id,
+    deviceID: req.body.deviceID
+  });
+
+  if (!userDevices)
+    return res
+      .status(401)
+      .json({ status: 401, message: `Please bind this device to continue` });
+
+  const log = await db.Log.create({
+    userID: req.body.userID,
+    device: userDevices._id,
+    status: 'successful'
+  });
+
+  return res
+    .status(200)
+    .json({ status: 200, message: `user device already successfully binded`, log } );
+};
