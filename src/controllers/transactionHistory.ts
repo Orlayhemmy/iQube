@@ -40,24 +40,45 @@ export const sortHistory = async (req: Request, res: Response) => {
     };
     let response = await rp(options);
     if (response.ResponseCode == '00') {
-      let yesterdaysTransaction = response.Transactions.filter((item: { date: string | number | Date; }) => {
-        if (yesterday() == new Date(item.date).toDateString()) {
-          return item;
+      let yesterdaysTransaction = response.Transactions.filter(
+        (item: { date: string | number | Date }) => {
+          if (yesterday() == new Date(item.date).toDateString()) {
+            return item;
+          }
+        }
+      );
+      let todaysTransaction = response.Transactions.filter(
+        (item: { date: string | number | Date }) => {
+          if (new Date().toDateString() == new Date(item.date).toDateString()) {
+            return item;
+          }
+        }
+      );
+      let thisWeek = pastWeek();
+      let pastWeekTransactions = response.Transactions.filter(
+        (item: { date: string | number | Date }) => {
+          if (thisWeek.includes(new Date(item.date).toDateString())) {
+            return item;
+          }
+        }
+      );
+
+      return res.status(200).json({
+        status: 200,
+        data: {
+          yesterdaysTransaction,
+          todaysTransaction,
+          pastWeekTransactions
         }
       });
-     let todaysTransaction = response.Transactions.filter((item: { date: string | number | Date; }) => {
-       if (new Date().toDateString() == new Date(item.date).toDateString()) {
-         return item;
-       }
-     });
-     let thisWeek = pastWeek()
-     let pastWeekTransactions = obj.Transactions.filter(item => {
-       if (thisWeek.includes(new Date(item.date).toDateString())) {
-         return item;
-       }
-     });
-
-
     }
-  } catch (e) {}
+    return res.status(400).json({
+      status: response.ResponseCode,
+      message: response.ResponseDescription
+    });
+  } catch (e) {
+    return res
+      .status(e.statusCode)
+      .json({ status: e.statusCode, message: e.message });
+  }
 };
