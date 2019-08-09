@@ -11,7 +11,7 @@ const options = {
   useCreateIndex: true
 };
 
-mongoose.connect(`${process.env.MONGODB_URI}`, options);
+mongoose.connect(`${process.env.MONGO_URI_STAGING}`, options);
 
 mongoose.connection.on('err', err => {
   console.error(console.error(`🙅 🚫 🙅 🚫 🙅 🚫 🙅 🚫 → ${err.message}`));
