@@ -10,7 +10,7 @@ router.route('/login/logs').post(asyncError(user.login));
 router.route('/transaction/history').post(asyncError(transaction.sortHistory));
 
 router
-  .route('/edit/beneficiary')
+  .route('/mybank/edit/beneficiary')
   .post(asyncError(beneficiaryController.editBeneficiary));
 
 export { router };
