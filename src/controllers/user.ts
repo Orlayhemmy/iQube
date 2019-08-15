@@ -1,9 +1,28 @@
 import { Request, Response } from 'express';
 import * as db from '../models';
 import { validator } from '../errorhandler/errorhandler';
+import * as rp from 'request-promise-native';
 
+const url = `https://stanbic.nibse.com/mybank/api/UserProfileManagement/InitiateOTPRequest`;
+
+async function initialOTP(req: Request) {
+  const data = {
+    UserId: req.body.userID,
+    CifId: req.body.CifId
+  };
+  const options = {
+    method: 'POST',
+    uri: url,
+    body: data,
+    json: true,
+    headers: {
+      'content-type': 'application/json'
+    }
+  };
+  return await rp(options);
+}
 /* 
-  when a user logs in we first check that they the device they're logging in
+  when a user logs in we first check that the device they're logging in
   with is binded, if not, we tell them to bind their device which will
   require them calling this endpoint below
 */
@@ -69,27 +88,45 @@ export const deviceBinding = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-  let inputs = ['deviceID', 'userID'];
+  let inputs = ['deviceID', 'userID', 'CifId'];
   let err = validator(inputs, req.body);
   if (err.length >= 1)
     return res.status(401).json({ status: 401, message: err });
 
   // first find user. if no user, they've not binded
   const user = await db.User.findOne({ userID: req.body.userID });
-  if (!user)
+  if (!user) {
+    // initiate otp
+    let response = await initialOTP(req);
+    if (response.ResponseCode == '00') {
+      return res.status(200).json({
+        status: 200,
+        message: `An otp has been sent to your mobile number for device binding`
+      });
+    }
     return res
       .status(401)
       .json({ status: 401, message: `Please bind this device to continue` });
-
+  }
   const userDevices = await db.Device.findOne({
     user: user._id,
     deviceID: req.body.deviceID
   });
 
-  if (!userDevices)
-    return res
-      .status(401)
-      .json({ status: 401, message: `Please bind this device to continue` });
+  if (!userDevices) {
+    // initiate otp
+    let response = await initialOTP(req);
+    if (response.ResponseCode == '00') {
+      return res.status(200).json({
+        status: 200,
+        message: `An otp has been sent to your mobile number for device binding`
+      });
+    }
+    return res.status(401).json({
+      status: 401,
+      message: `Please bind this device to continue`
+    });
+  }
 
   const log = await db.Log.create({
     userID: req.body.userID,
@@ -97,7 +134,9 @@ export const login = async (req: Request, res: Response) => {
     status: 'successful'
   });
 
-  return res
-    .status(200)
-    .json({ status: 200, message: `user device already successfully binded`, log } );
+  return res.status(200).json({
+    status: 200,
+    message: `user device already successfully binded`,
+    log
+  });
 };
