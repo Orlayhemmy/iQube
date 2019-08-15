@@ -86,8 +86,8 @@ export const fetchBeneficiary = async (req: Request, res: Response) => {
     let err = validator(input, req.body);
     if (err.length) return res.status(400).json({ status: 400, err });
     const data = {
-      AccountNo: '0023120061',
-      UserId: '0006756856'
+      AccountNo: req.body.AccountNo,
+      UserId: req.body.UserId
     };
     const options = {
       method: 'POST',
