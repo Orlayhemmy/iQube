@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import * as rp from 'request-promise-native';
 import { validator } from '../errorhandler/errorhandler';
 
