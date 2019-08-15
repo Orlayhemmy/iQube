@@ -12,5 +12,8 @@ router.route('/transaction/history').post(asyncError(transaction.sortHistory));
 router
   .route('/mybank/edit/beneficiary')
   .post(asyncError(beneficiaryController.editBeneficiary));
+router
+  .route('/mybank/fetch/beneficiary')
+  .post(asyncError(beneficiaryController.fetchBeneficiary));
 
 export { router };
