@@ -5,6 +5,7 @@ import { validator } from '../errorhandler/errorhandler';
 import * as db from '../models';
 const editBeneficiaryURl = `https://stanbic.nibse.com/mybank/api/BeneficiaryManagement/EditBeneficiary`;
 const fetchBeneficiaryUrl = `https://stanbic.nibse.com/mybank/api/BeneficiaryManagement/GetBeneficiaryList`;
+const addBeneficiaryUrl = `https://stanbic.nibse.com/mybank/api/BeneficiaryManagement/AddBeneficiary`;
 
 export const editBeneficiary = async (req: Request, res: Response) => {
   try {
@@ -118,6 +119,108 @@ export const fetchBeneficiary = async (req: Request, res: Response) => {
 
       return res.status(200).json({
         Beneficiaries,
+        status: 200,
+        ResponseCode: response.ResponseCode,
+        ResponseFriendlyMessage: response.ResponseFriendlyMessage
+      });
+    }
+    return res.status(400).json({
+      status: response.ResponseCode,
+      message: response.ResponseDescription
+    });
+  } catch (e) {
+    return res
+      .status(e.statusCode)
+      .json({ status: e.statusCode, message: e.message });
+  }
+};
+
+export const addBeneficiary = async (req: Request, res: Response) => {
+  try {
+    let input = [
+      'userId',
+      'beneficiaryAlias',
+      'beneficiaryName',
+      'beneficiaryAccountNumber',
+      'beneficiaryBank',
+      'beneficiaryBankCode',
+      'beneficiaryReference',
+      'customerReference',
+      'otp',
+      'Token'
+    ];
+    let err = validator(input, req.body);
+    if (err.length) return res.status(400).json({ status: 400, err });
+
+    let data = {
+      sessionId: randomBytes(5).toString('hex'),
+      userId: req.body.userId,
+      beneficiaryAlias: req.body.beneficiaryAlias,
+      beneficiaryName: req.body.beneficiaryName,
+      beneficiaryAccountNumber: req.body.beneficiaryAccountNumber,
+      beneficiaryBank: req.body.beneficiaryBank,
+      beneficiaryBankCode: req.body.beneficiaryBankCode,
+      beneficiaryEmailAddress: req.body.beneficiaryEmailAddress,
+      beneficiaryReference: req.body.beneficiaryReference,
+      customerReference: req.body.customerReference,
+      otp: req.body.otp,
+      otpReference: ''
+    };
+
+    const options = {
+      method: 'POST',
+      uri: addBeneficiaryUrl,
+      body: data,
+      json: true,
+      headers: {
+        'content-type': 'application/json',
+        'X-STC-AGENT-CACHE': req.body.userId,
+        Authorization: `Bearer ${req.body.Token}`
+      }
+    };
+    let response = await rp(options);
+    if (response.ResponseCode == '00') {
+      // search for the newly created beneficiary
+      // so you can get their beneficiaryid
+      const data = {
+        UserId: req.body.userId
+      };
+      const options = {
+        method: 'POST',
+        uri: fetchBeneficiaryUrl,
+        body: data,
+        json: true,
+        headers: {
+          'content-type': 'application/json',
+          'X-STC-AGENT-CACHE': req.body.userId,
+          Authorization: `Bearer ${req.body.Token}`
+        }
+      };
+      let response = await rp(options);
+      if (response.ResponseCode == '00') {
+        let beneficiaries = response.Beneficiaries.filter(
+          (benef: { beneficiaryAccountNumber: string }) =>
+            benef.beneficiaryAccountNumber == req.body.beneficiaryAccountNumber
+        );
+        if (beneficiaries.length) {
+          let image = req.body.image ? req.body.image : '';
+          // check that the beneficiaryid does not exist already
+          for (let val of beneficiaries) {
+            let found = await db.Beneficiary.findOne({
+              userId: req.body.userId,
+              beneficiaryId: val.beneficiaryId
+            });
+            if (!found) {
+              let updated = await db.Beneficiary.create({
+                userId: req.body.userId,
+                beneficiaryId: val.beneficiaryId,
+                image
+              });
+            }
+          }
+        }
+      }
+      return res.status(200).json({
         status: 200,
         ResponseCode: response.ResponseCode,
         ResponseFriendlyMessage: response.ResponseFriendlyMessage
