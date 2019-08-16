@@ -15,5 +15,8 @@ router
 router
   .route('/mybank/fetch/beneficiary')
   .post(asyncError(beneficiaryController.fetchBeneficiary));
+router
+  .route('/mybank/add/beneficiary')
+  .post(asyncError(beneficiaryController.addBeneficiary));
 
 export { router };
