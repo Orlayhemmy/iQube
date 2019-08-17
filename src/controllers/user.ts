@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import * as db from '../models';
 import { validator } from '../errorhandler/errorhandler';
 import * as rp from 'request-promise-native';
-
-const url = `https://stanbic.nibse.com/mybank/api/UserProfileManagement/InitiateOTPRequest`;
+const baseUrl = `https://stanbic.nibse.com/mybank/api`;
+const url = `${baseUrl}/UserProfileManagement/InitiateOTPRequest`;
 
 async function initialOTP(req: Request) {
   const data = {
@@ -28,63 +28,93 @@ async function initialOTP(req: Request) {
 */
 
 export const deviceBinding = async (req: Request, res: Response) => {
-  // a device can be binded to five accounts
-  // and you can have five accounts binded to one device
-
-  // find if user exists already
-  let inputs = ['deviceName', 'deviceID', 'deviceOS'];
-  let userID = req.body.userID;
-  let deviceID = req.body.deviceID;
-  if (!userID) {
-    return res.status(400).json({ status: 200, message: `Please add userID` });
-  }
-
+  let inputs = [
+    'deviceName',
+    'deviceID',
+    'deviceOS',
+    'Otp',
+    'Reference',
+    'userID',
+    'Token'
+  ];
   let err = validator(inputs, req.body);
   if (err.length >= 1)
     return res.status(400).json({ status: 400, message: err });
 
-  let user = await db.User.findOne({ userID });
-  if (!user) {
-    // create user
-    user = await db.User.create({ userID });
-  }
-  // find the user in the device Collection and make sure
-  // their device's is not more than five
-  // first make sure the device ID does not exist
-  const foundDevice = await db.Device.findOne({ deviceID: req.body.deviceID });
-  if (foundDevice)
-    return res
-      .status(400)
-      .json({ status: 400, message: `device already binded, please login` });
+  // validate otp
+  const validateOTPURL = `${baseUrl}api/UserProfileManagement/ValidateOTP`;
+  const data = {
+    UserId: req.body.userID,
+    Otp: req.body.Otp,
+    Reference: 'OTP reference from otp initiation'
+  };
+  const options = {
+    method: 'POST',
+    uri: validateOTPURL,
+    body: data,
+    json: true,
+    headers: {
+      'content-type': 'application/json',
+      'X-STC-AGENT-CACHE': req.body.userID,
+      Authorization: `Bearer ${req.body.Token}`
+    }
+  };
+  let response = await rp(options);
+  // a device can be binded to five accounts
+  // and you can have five accounts binded to one device
+  if (response.ResponseCode == '00') {
+    // find if user exists already
+    let userID = req.body.userID;
+    let deviceID = req.body.deviceID;
 
-  const userDevices = await db.Device.find({ user: user._id });
-  if (userDevices.length < 5) {
-    // add the device for the user in device Model
-    const device = await db.Device.create({
-      deviceName: req.body.deviceName,
-      deviceID: req.body.deviceID,
-      deviceOS: req.body.deviceOS,
-      user: user._id
+    let user = await db.User.findOne({ userID });
+    if (!user) {
+      // create user
+      user = await db.User.create({ userID });
+    }
+    // find the user in the device Collection and make sure
+    // their device's is not more than five
+    // first make sure the device ID does not exist
+    const foundDevice = await db.Device.findOne({
+      deviceID: req.body.deviceID
     });
-    // update the user model with the device id
-    let updatingUserSchema = await db.User.findOneAndUpdate(
-      { _id: user._id },
-      { $addToSet: { device: device._id } },
-      { new: true }
-    );
-    return res.status(200).json({
-      status: 200,
-      data: {
-        device,
-        updatingUserSchema,
-        message: `Device successfully binded`
-      }
+    if (foundDevice)
+      return res
+        .status(400)
+        .json({ status: 400, message: `device already binded, please login` });
+
+    const userDevices = await db.Device.find({ user: user._id });
+    if (userDevices.length < 5) {
+      // add the device for the user in device Model
+      const device = await db.Device.create({
+        deviceName: req.body.deviceName,
+        deviceID: req.body.deviceID,
+        deviceOS: req.body.deviceOS,
+        user: user._id
+      });
+      // update the user model with the device id
+      let updatingUserSchema = await db.User.findOneAndUpdate(
+        { _id: user._id },
+        { $addToSet: { device: device._id } },
+        { new: true }
+      );
+      return res.status(200).json({
+        status: 200,
+        data: {
+          device,
+          updatingUserSchema,
+          message: `Device successfully binded`
+        }
+      });
+    }
+    return res.status(400).json({
+      status: 400,
+      message: `You already have 5 devices bounded to this account, please unbind one to add this`
     });
   }
-  return res.status(400).json({
-    status: 400,
-    message: `You already have 5 devices bounded to this account, please unbind one to add this`
-  });
+  return res
+    .status(400)
+    .json({ status: 400, message: `Unable to validate OTP` });
 };
 
 export const login = async (req: Request, res: Response) => {
@@ -101,7 +131,7 @@ export const login = async (req: Request, res: Response) => {
     if (response.ResponseCode == '00') {
       return res.status(200).json({
         status: 200,
-        message: `An otp has been sent to your mobile number for device binding`
+        message: `An otp has been sent to you for device binding`
       });
     }
     return res
