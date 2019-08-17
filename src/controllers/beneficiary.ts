@@ -3,9 +3,10 @@ import * as rp from 'request-promise-native';
 import { randomBytes } from 'crypto';
 import { validator } from '../errorhandler/errorhandler';
 import * as db from '../models';
-const editBeneficiaryURl = `https://stanbic.nibse.com/mybank/api/BeneficiaryManagement/EditBeneficiary`;
-const fetchBeneficiaryUrl = `https://stanbic.nibse.com/mybank/api/BeneficiaryManagement/GetBeneficiaryList`;
-const addBeneficiaryUrl = `https://stanbic.nibse.com/mybank/api/BeneficiaryManagement/AddBeneficiary`;
+let baseUrl = `https://stanbic.nibse.com/mybank/api`;
+const editBeneficiaryURl = `${baseUrl}/BeneficiaryManagement/EditBeneficiary`;
+const fetchBeneficiaryUrl = `${baseUrl}/BeneficiaryManagement/GetBeneficiaryList`;
+const addBeneficiaryUrl = `${baseUrl}/BeneficiaryManagement/AddBeneficiary`;
 
 export const editBeneficiary = async (req: Request, res: Response) => {
   try {
