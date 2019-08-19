@@ -8,6 +8,7 @@ const router = Router();
 router.route('/device/binding').post(asyncError(user.deviceBinding));
 router.route('/login/logs').post(asyncError(user.login));
 router.route('/transaction/history').post(asyncError(transaction.sortHistory));
+router.route('/device/all').post(asyncError(user.viewAllBindedDevices));
 
 router
   .route('/mybank/edit/beneficiary')
