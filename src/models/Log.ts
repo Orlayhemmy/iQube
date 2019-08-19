@@ -3,14 +3,14 @@ import { Device } from './Device';
 
 export interface Logs extends Document {
   userID: String;
-  deviceID: Device['_id'];
+  device: Device['_id'];
   status: String;
 }
 
 const logSchema = new Schema(
   {
     userID: String,
-    deviceID: { type: Schema.Types.ObjectId, ref: 'Device' },
+    device: { type: Schema.Types.ObjectId, ref: 'Device' },
     status: String
   },
   { timestamps: true }
