@@ -20,4 +20,9 @@ router
   .route('/mybank/add/beneficiary')
   .post(asyncError(beneficiaryController.addBeneficiary));
 
+router
+  .route('/mybank/addprofile')
+  .post(asyncError(user.addOrUpdateProfileImage));
+
+router.route('/mybank/viewprofile').post(asyncError(user.fetchImage));
 export { router };
