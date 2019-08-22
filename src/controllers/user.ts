@@ -60,7 +60,7 @@ export const fetchImage = async (req: Request, res: Response) => {
 
   const user = await db.User.findOne({ userID: req.body.userID });
   let image = user ? user.profilePicture : '';
-  return res.status(200).json({ status: 200, data: image });
+  return res.status(200).json({ status: 200, data: { profilePicture: image } });
 };
 
 export const deviceBinding = async (req: Request, res: Response) => {
