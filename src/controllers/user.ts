@@ -27,6 +27,30 @@ async function initialOTP(req: Request) {
   require them calling this endpoint below
 */
 
+export const addOrUpdateProfileImage = async (req: Request, res: Response) => {
+  if (req.body.userID)
+    return res
+      .status(400)
+      .json({ status: 400, message: `Please enter userID` });
+
+  let image = req.body.image || '';
+  // check if user exists
+  const user = await db.User.findOne({ userID: req.body.userID });
+  if (!user) {
+    await db.User.create({ userID: req.body.userID });
+  } else {
+    await db.User.findOneAndUpdate(
+      { _id: user.id },
+      { $set: { image } },
+      { new: true }
+    );
+  }
+
+  return res
+    .status(200)
+    .json({ status: 200, message: `Image successfully added` });
+};
+
 export const deviceBinding = async (req: Request, res: Response) => {
   try {
     let inputs = [
@@ -60,7 +84,6 @@ export const deviceBinding = async (req: Request, res: Response) => {
         Authorization: `Bearer ${req.body.Token}`
       }
     };
-    console.log('options', options);
     let response = await rp(options);
     // a device can be binded to five accounts
     // and you can have five accounts binded to one device
@@ -198,10 +221,8 @@ export const viewAllBindedDevices = async (req: Request, res: Response) => {
   if (usersDevices)
     return res.status(200).json({ status: 200, data: usersDevices });
 
-  return res
-    .status(400)
-    .json({
-      status: 400,
-      message: `You have no devices bounded to this account`
-    });
+  return res.status(400).json({
+    status: 400,
+    message: `You have no devices bounded to this account`
+  });
 };
