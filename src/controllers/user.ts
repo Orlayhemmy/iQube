@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as db from '../models';
 import { validator } from '../errorhandler/errorhandler';
 import * as rp from 'request-promise-native';
+import { EDESTADDRREQ } from 'constants';
 const baseUrl = `https://stanbic.nibse.com/mybank/api`;
 const url = `${baseUrl}/UserProfileManagement/InitiateOTPRequest`;
 
@@ -28,7 +29,7 @@ async function initialOTP(req: Request) {
 */
 
 export const addOrUpdateProfileImage = async (req: Request, res: Response) => {
-  if (req.body.userID)
+  if (!req.body.userID)
     return res
       .status(400)
       .json({ status: 400, message: `Please enter userID` });
@@ -41,7 +42,7 @@ export const addOrUpdateProfileImage = async (req: Request, res: Response) => {
   } else {
     await db.User.findOneAndUpdate(
       { _id: user.id },
-      { $set: { image } },
+      { $set: { profilePicture: image } },
       { new: true }
     );
   }
@@ -49,6 +50,17 @@ export const addOrUpdateProfileImage = async (req: Request, res: Response) => {
   return res
     .status(200)
     .json({ status: 200, message: `Image successfully added` });
+};
+
+export const fetchImage = async (req: Request, res: Response) => {
+  if (!req.body.userID)
+    return res
+      .status(400)
+      .json({ status: 400, message: `Please enter userID` });
+
+  const user = await db.User.findOne({ userID: req.body.userID });
+  let image = user ? user.profilePicture : '';
+  return res.status(200).json({ status: 200, data: image });
 };
 
 export const deviceBinding = async (req: Request, res: Response) => {
