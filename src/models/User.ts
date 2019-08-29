@@ -2,8 +2,8 @@ import { model, Document, Schema } from 'mongoose';
 import { Device } from './Device';
 
 export interface User extends Document {
-  userID: String;
-  profilePicture: String;
+  userID: string;
+  profilePicture: string;
   device: [Device['_id']];
 }
 
