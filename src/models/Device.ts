@@ -2,9 +2,9 @@ import { model, Document, Schema } from 'mongoose';
 
 export interface Device extends Document {
   deviceID: string;
-  deviceName: String;
-  deviceOS: String;
-  userID: String;
+  deviceName: string;
+  deviceOS: string;
+  userID: string;
 }
 
 const deviceSchema: Schema = new Schema(

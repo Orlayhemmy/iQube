@@ -2,9 +2,9 @@ import { model, Document, Schema } from 'mongoose';
 import { Device } from './Device';
 
 export interface Logs extends Document {
-  userID: String;
+  userID: string;
   device: Device['_id'];
-  status: String;
+  status: string;
 }
 
 const logSchema = new Schema(
