@@ -1,12 +1,13 @@
-import { Request, Response } from 'express';
+import { Request, Response, response } from 'express';
 import * as db from '../models';
 import { validator } from '../errorhandler/errorhandler';
 import * as rp from 'request-promise-native';
 import { EDESTADDRREQ } from 'constants';
 const baseUrl = `https://stanbic.nibse.com/mybank/api`;
-const url = `${baseUrl}/UserProfileManagement/InitiateOTPRequest`;
+const initiateOTPUrl = `${baseUrl}/UserProfileManagement/InitiateOTPRequest`;
+const dataPolicyUrl = `${baseUrl}/UserProfileManagement/ConfirmIfUserDataPrivacyExist`;
 
-async function initialOTP(req: Request) {
+async function initiateOTPorCheckDataPolicy(req: Request, url: string) {
   const data = {
     UserId: req.body.userID,
     CifId: req.body.CifId
@@ -17,16 +18,13 @@ async function initialOTP(req: Request) {
     body: data,
     json: true,
     headers: {
-      'content-type': 'application/json'
+      'content-type': 'application/json',
+      'X-STC-AGENT-CACHE': req.body.userID,
+      Authorization: `Bearer ${req.body.Token}`
     }
   };
   return await rp(options);
 }
-/* 
-  when a user logs in we first check that the device they're logging in
-  with is binded, if not, we tell them to bind their device which will
-  require them calling this endpoint below
-*/
 
 export const addOrUpdateProfileImage = async (req: Request, res: Response) => {
   if (!req.body.userID)
@@ -111,25 +109,24 @@ export const deviceBinding = async (req: Request, res: Response) => {
       }
       // find the user in the device Collection and make sure
       // their device's is not more than five
-      // first make sure the device ID does not exist
-      const foundDevice = await db.Device.findOne({
-        deviceID: req.body.deviceID
-      });
-      if (foundDevice)
-        return res.status(400).json({
-          status: 400,
-          message: `device already binded, please login`
-        });
 
       const userDevices = await db.Device.find({ user: user._id });
       if (userDevices.length < 5) {
         // add the device for the user in device Model
-        const device = await db.Device.create({
-          deviceName: req.body.deviceName,
+
+        //first find the device, if it does not exist, create it
+        let device = await db.Device.findOne({
           deviceID: req.body.deviceID,
-          deviceOS: req.body.deviceOS,
           user: user._id
         });
+        if (!device) {
+          device = await db.Device.create({
+            deviceName: req.body.deviceName,
+            deviceID: req.body.deviceID,
+            deviceOS: req.body.deviceOS,
+            user: user._id
+          });
+        }
         // update the user model with the device id
         let updatingUserSchema = await db.User.findOneAndUpdate(
           { _id: user._id },
@@ -154,33 +151,48 @@ export const deviceBinding = async (req: Request, res: Response) => {
       .status(400)
       .json({ status: 400, message: `Unable to validate OTP` });
   } catch (e) {
-    return res
-      .status(e.statusCode)
-      .json({ status: e.statusCode, message: e.message });
+    if (e.statusCode)
+      return res
+        .status(e.statusCode)
+        .json({ status: e.statusCode, message: e.message });
+    return res.status(400).json({ status: 400, message: e.message });
   }
 };
 
+/* 
+  when a user logs in we first check that the device they're logging in
+  with is binded, if not, we tell them to bind their device which will
+  require them calling this endpoint below
+*/
 export const login = async (req: Request, res: Response) => {
   try {
-    let inputs = ['deviceID', 'userID', 'CifId'];
+    let inputs = ['deviceID', 'userID', 'CifId', 'Token'];
     let err = validator(inputs, req.body);
     if (err.length >= 1)
       return res.status(401).json({ status: 401, message: err });
 
+    // check if user has done data policy
+    let dataPolicy = await initiateOTPorCheckDataPolicy(req, dataPolicyUrl);
+    if (dataPolicy.ResponseCode == '70') {
+      return res
+        .status(200)
+        .json({ status: 201, message: dataPolicy.ResponseFriendlyMessage });
+    }
+
     // first find user. if no user, they've not binded
     const user = await db.User.findOne({ userID: req.body.userID });
+
     if (!user) {
       // initiate otp
-      let response = await initialOTP(req);
-      if (response.ResponseCode == '00') {
-        return res.status(202).json({
-          status: 202,
-          message: `An otp has been sent to you for device binding`
-        });
+      let response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+      if (response.ResponseCode != '00') {
+        // try resending otp again
+        await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
       }
-      return res
-        .status(401)
-        .json({ status: 401, message: `Please bind this device to continue` });
+      return res.status(200).json({
+        status: 202,
+        message: `An otp has been sent to you for device binding`
+      });
     }
     const userDevices = await db.Device.findOne({
       user: user._id,
@@ -189,16 +201,14 @@ export const login = async (req: Request, res: Response) => {
 
     if (!userDevices) {
       // initiate otp
-      let response = await initialOTP(req);
-      if (response.ResponseCode == '00') {
-        return res.status(202).json({
-          status: 202,
-          message: `An otp has been sent to you for device binding`
-        });
+      let response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+      if (response.ResponseCode != '00') {
+        // try resending otp again
+        await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
       }
-      return res.status(401).json({
-        status: 401,
-        message: `Please bind this device to continue`
+      return res.status(200).json({
+        status: 202,
+        message: `An otp has been sent to you for device binding`
       });
     }
 
@@ -214,9 +224,11 @@ export const login = async (req: Request, res: Response) => {
       log
     });
   } catch (e) {
-    return res
-      .status(e.statusCode)
-      .json({ status: e.statusCode, message: e.message });
+    if (e.statusCode)
+      return res
+        .status(e.statusCode)
+        .json({ status: e.statusCode, message: e.message });
+    return res.status(400).json({ status: 400, message: e.message });
   }
 };
 
@@ -228,7 +240,7 @@ export const viewAllBindedDevices = async (req: Request, res: Response) => {
 
   const usersDevices = await db.User.findOne({
     userID: req.body.userID
-  }).populate('device', 'device');
+  }).populate('device', 'deviceID deviceName deviceOS');
 
   if (usersDevices)
     return res.status(200).json({ status: 200, data: usersDevices });
@@ -237,4 +249,93 @@ export const viewAllBindedDevices = async (req: Request, res: Response) => {
     status: 400,
     message: `You have no devices bounded to this account`
   });
+};
+
+export const sendOTPforUnLinkDevice = async (req: Request, res: Response) => {
+  let inputs = ['userID', 'CifId', 'Token'];
+  let err = validator(inputs, req.body);
+  if (err.length >= 1)
+    return res.status(401).json({
+      status: 401,
+      message: err
+    });
+
+  let response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+  if (response.ResponseCode != '00') {
+    // try resending otp again
+    await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+  }
+  return res.status(200).json({
+    status: 200,
+    message: `An otp has been sent to you for device binding`
+  });
+};
+
+export const unlinkDevice = async (req: Request, res: Response) => {
+  try {
+    // validate otp
+    let inputs = ['deviceID', 'Otp', 'Reference', 'userID', 'Token'];
+    let err = validator(inputs, req.body);
+    if (err.length >= 1)
+      return res.status(400).json({ status: 400, message: err });
+    const validateOTPURL = `${baseUrl}/UserProfileManagement/ValidateOTP`;
+    const data = {
+      UserId: req.body.userID,
+      Otp: req.body.Otp,
+      Reference: req.body.Reference
+    };
+    const options = {
+      method: 'POST',
+      uri: validateOTPURL,
+      body: data,
+      json: true,
+      headers: {
+        'content-type': 'application/json',
+        'X-STC-AGENT-CACHE': req.body.userID,
+        Authorization: `Bearer ${req.body.Token}`
+      }
+    };
+    let response = await rp(options);
+
+    if (response.ResponseCode == '00') {
+      // find device and update status
+      const user = await db.User.findOne({ userID: req.body.userID });
+      if (user) {
+        console.log('got here');
+        const device = await db.Device.findOne({
+          deviceID: req.body.deviceID,
+          user: user._id
+        });
+        if (!device)
+          return res.status(400).json({
+            status: 400,
+            message: `Could not unlink Device please try again`
+          });
+
+        // unlink device from user's profile
+        await db.User.findOneAndUpdate(
+          { _id: user._id },
+          { $pull: { device: device._id } },
+          { new: true }
+        );
+        return res
+          .status(200)
+          .json({ status: 200, message: 'Device successfully unlinked' });
+      }
+      return res.status(400).json({
+        status: 400,
+        message: `Could not unlink Device because it has not been linked before`
+      });
+    }
+    return res.status(400).json({
+      status: 400,
+      message: `Could not validate OTP`
+    });
+  } catch (e) {
+    if (e.statusCode)
+      return res
+        .status(e.statusCode)
+        .json({ status: e.statusCode, message: e.message });
+    return res.status(400).json({ status: 400, message: e.message });
+  }
 };
