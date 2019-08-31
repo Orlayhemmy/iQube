@@ -38,7 +38,7 @@ export const addOrUpdateProfileImage = async (req: Request, res: Response) => {
   // check if user exists
   const user = await db.User.findOne({ userID: req.body.userID });
   if (!user) {
-    await db.User.create({ userID: req.body.userID });
+    await db.User.create({ userID: req.body.userID, profilePicture: image });
   } else {
     await db.User.findOneAndUpdate(
       { _id: user.id },
