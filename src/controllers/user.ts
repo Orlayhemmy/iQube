@@ -171,7 +171,7 @@ export const login = async (req: Request, res: Response) => {
     if (err.length >= 1)
       return res.status(401).json({ status: 401, message: err });
 
-    // check if user has done data policy
+    // check if user has donehd data policy
     let dataPolicy = await initiateOTPorCheckDataPolicy(req, dataPolicyUrl);
     if (dataPolicy.ResponseCode == '70') {
       return res
@@ -187,11 +187,12 @@ export const login = async (req: Request, res: Response) => {
       let response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
       if (response.ResponseCode != '00') {
         // try resending otp again
-        await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+        response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
       }
       return res.status(200).json({
         status: 202,
-        message: `An otp has been sent to you for device binding`
+        message: `An otp has been sent to you for device binding`,
+        Reference: response.ResponseDescription
       });
     }
     const userDevices = await db.Device.findOne({
@@ -204,11 +205,12 @@ export const login = async (req: Request, res: Response) => {
       let response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
       if (response.ResponseCode != '00') {
         // try resending otp again
-        await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+       response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
       }
       return res.status(200).json({
         status: 202,
-        message: `An otp has been sent to you for device binding`
+        message: `An otp has been sent to you for device binding`,
+        Reference: response.ResponseDescription
       });
     }
 
