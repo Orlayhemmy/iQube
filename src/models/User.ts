@@ -10,7 +10,7 @@ export interface User extends Document {
 const userSchema = new Schema(
   {
     userID: { type: String, index: true },
-    profilePicture: String,
+    profilePicture: { type: String, default: '' },
     device: [{ type: Schema.Types.ObjectId, ref: 'Device' }]
   },
   { timestamps: true }
