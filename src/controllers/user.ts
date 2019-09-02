@@ -107,18 +107,39 @@ export const deviceBinding = async (req: Request, res: Response) => {
         // create user
         user = await db.User.create({ userID });
       }
+
+      // check that device is not binded to more than five profiles(userId)
+      const devices = await db.Device.find({
+        deviceID: req.body.deviceID,
+        isUnLinked: false
+      });
+
+      if (devices.length && devices.length >= 5) {
+        return res.status(400).json({
+          status: 400,
+          message: `You already have 5 profiles bounded to this device, please unbind one to add this`
+        });
+      }
+
       // find the user in the device Collection and make sure
       // their device's is not more than five
 
-      const userDevices = await db.Device.find({ user: user._id });
-      if (userDevices.length < 5) {
+      if (user.device.length < 5) {
         // add the device for the user in device Model
 
-        //first find the device, if it does not exist, create it
+        //first find the device and check if it's been unlinked, else create it
         let device = await db.Device.findOne({
           deviceID: req.body.deviceID,
-          user: user._id
+          user: user._id,
+          isUnLinked: true
         });
+        if (device) {
+          device = await db.Device.findOneAndUpdate(
+            { _id: device._id },
+            { isUnLinked: false },
+            { new: true }
+          );
+        }
         if (!device) {
           device = await db.Device.create({
             deviceName: req.body.deviceName,
@@ -144,7 +165,7 @@ export const deviceBinding = async (req: Request, res: Response) => {
       }
       return res.status(400).json({
         status: 400,
-        message: `You already have 5 devices bounded to this account, please unbind one to add this`
+        message: `You already have 5 devices bounded to this account, please unlink one to add this`
       });
     }
     return res
@@ -197,7 +218,8 @@ export const login = async (req: Request, res: Response) => {
     }
     const userDevices = await db.Device.findOne({
       user: user._id,
-      deviceID: req.body.deviceID
+      deviceID: req.body.deviceID,
+      isUnLinked: false
     });
 
     if (!userDevices) {
@@ -205,7 +227,7 @@ export const login = async (req: Request, res: Response) => {
       let response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
       if (response.ResponseCode != '00') {
         // try resending otp again
-       response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+        response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
       }
       return res.status(200).json({
         status: 202,
@@ -303,7 +325,6 @@ export const unlinkDevice = async (req: Request, res: Response) => {
       // find device and update status
       const user = await db.User.findOne({ userID: req.body.userID });
       if (user) {
-        console.log('got here');
         const device = await db.Device.findOne({
           deviceID: req.body.deviceID,
           user: user._id
@@ -311,9 +332,14 @@ export const unlinkDevice = async (req: Request, res: Response) => {
         if (!device)
           return res.status(400).json({
             status: 400,
-            message: `Could not unlink Device please try again`
+            message: `Could not unlink Device because it has not been linked before`
           });
-
+        // unlink device from device account
+        await db.Device.findOneAndUpdate(
+          { _id: device._id },
+          { isUnLinked: true },
+          { new: true }
+        );
         // unlink device from user's profile
         await db.User.findOneAndUpdate(
           { _id: user._id },
