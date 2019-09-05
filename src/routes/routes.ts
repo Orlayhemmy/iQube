@@ -3,6 +3,7 @@ import * as user from '../controllers/user';
 import { asyncError } from '../errorhandler/errorhandler';
 import * as transaction from '../controllers/transactionHistory';
 import * as beneficiaryController from '../controllers/beneficiary';
+import * as adminController from '../controllers/admin';
 const router = Router();
 
 router.route('/device/binding').post(asyncError(user.deviceBinding));
@@ -27,4 +28,6 @@ router
   .post(asyncError(user.addOrUpdateProfileImage));
 
 router.route('/mybank/viewprofile').post(asyncError(user.fetchImage));
+
+router.route('/admin/users').get(asyncError(adminController.fetchAllUsers));
 export { router };
