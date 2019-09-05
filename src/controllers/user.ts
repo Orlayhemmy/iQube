@@ -2,7 +2,6 @@ import { Request, Response, response } from 'express';
 import * as db from '../models';
 import { validator } from '../errorhandler/errorhandler';
 import * as rp from 'request-promise-native';
-import { EDESTADDRREQ } from 'constants';
 const baseUrl = `https://stanbic.nibse.com/mybank/api`;
 const initiateOTPUrl = `${baseUrl}/UserProfileManagement/InitiateOTPRequest`;
 const dataPolicyUrl = `${baseUrl}/UserProfileManagement/ConfirmIfUserDataPrivacyExist`;
