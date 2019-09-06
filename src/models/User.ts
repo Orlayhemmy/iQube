@@ -16,4 +16,5 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
+userSchema.index({ userID: 'text' });
 export default model<User>('User', userSchema);
