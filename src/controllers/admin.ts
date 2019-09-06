@@ -18,3 +18,13 @@ export const fetchAUser = async (req: Request, res: Response) => {
   );
   return res.status(200).json({ status: 200, data: { user } });
 };
+
+export const searchByUserID = async (req: Request, res: Response) => {
+  let q = req.query.q;
+  console.log(req.query)
+  const user = await db.User.find({
+    userID: { $regex: new RegExp(q), $options: 'i' }
+  });
+
+  return res.status(200).json({ status: 200, data: { user } });
+};
