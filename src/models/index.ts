@@ -21,3 +21,4 @@ export { default as Device } from './Device';
 export { default as User } from './User';
 export { default as Log } from './Log';
 export { default as Beneficiary } from './Beneficiary';
+export { default as AtEaseUser } from './@EaseProfile';
