@@ -10,3 +10,11 @@ export const fetchAllUsers = async (req: Request, res: Response) => {
 
   return res.status(200).json({ status: 200, data: { users } });
 };
+
+export const fetchAUser = async (req: Request, res: Response) => {
+  const user = await db.User.findOne({ userID: req.body.userID }).populate(
+    'device',
+    'deviceID deviceName deviceOS'
+  );
+  return res.status(200).json({ status: 200, data: { user } });
+};
