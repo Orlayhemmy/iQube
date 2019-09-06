@@ -30,4 +30,6 @@ router
 router.route('/mybank/viewprofile').post(asyncError(user.fetchImage));
 
 router.route('/admin/users').get(asyncError(adminController.fetchAllUsers));
+
+router.route('/admin/user/:id').get(asyncError(adminController.fetchAUser));
 export { router };
