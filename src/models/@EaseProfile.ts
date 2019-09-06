@@ -12,7 +12,7 @@ export interface UserAtEase extends Document {
 const userSchema = new Schema(
   {
     userID: { type: String, index: true },
-    profilePicture: String,
+    profilePicture: { type: String, default: '' },
     deviceID: String,
     deviceName: String,
     deviceOS: String
