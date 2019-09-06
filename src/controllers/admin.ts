@@ -12,7 +12,7 @@ export const fetchAllUsers = async (req: Request, res: Response) => {
 };
 
 export const fetchAUser = async (req: Request, res: Response) => {
-  const user = await db.User.findOne({ userID: req.body.userID }).populate(
+  const user = await db.User.findOne({ userID: req.params.id }).populate(
     'device',
     'deviceID deviceName deviceOS'
   );
