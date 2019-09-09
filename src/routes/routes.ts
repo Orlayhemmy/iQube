@@ -4,6 +4,7 @@ import { asyncError } from '../errorhandler/errorhandler';
 import * as transaction from '../controllers/transactionHistory';
 import * as beneficiaryController from '../controllers/beneficiary';
 import * as adminController from '../controllers/admin';
+import * as advertController from '../controllers/advert';
 const router = Router();
 
 router.route('/device/binding').post(asyncError(user.deviceBinding));
@@ -32,8 +33,15 @@ router.route('/mybank/viewprofile').post(asyncError(user.fetchImage));
 router.route('/admin/users').get(asyncError(adminController.fetchAllUsers));
 
 router
-.route('/admin/user/search')
-.get(asyncError(adminController.searchByUserID));
+  .route('/admin/user/search')
+  .get(asyncError(adminController.searchByUserID));
 
 router.route('/admin/user/:id').get(asyncError(adminController.fetchAUser));
+
+router
+  .route('/admin/advert')
+  .post(asyncError(advertController.createAdvert))
+  .get(asyncError(advertController.fetchAllAdverts));
+
+router.route('/admin/advert/:id').get(asyncError(advertController.fetchAdvert));
 export { router };
