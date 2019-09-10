@@ -326,12 +326,13 @@ export const unlinkDevice = async (req: Request, res: Response) => {
       if (user) {
         const device = await db.Device.findOne({
           deviceID: req.body.deviceID,
-          user: user._id
+          user: user._id,
+          isUnLinked: false
         });
         if (!device)
           return res.status(400).json({
             status: 400,
-            message: `Could not unlink Device because it has not been linked before`
+            message: `Could not unlink Device because it is not currently linked`
           });
         // unlink device from device account
         await db.Device.findOneAndUpdate(
@@ -351,7 +352,7 @@ export const unlinkDevice = async (req: Request, res: Response) => {
       }
       return res.status(400).json({
         status: 400,
-        message: `Could not unlink Device because it has not been linked before`
+        message: `Could not unlink Device because it is not currently linked`
       });
     }
     return res.status(400).json({
