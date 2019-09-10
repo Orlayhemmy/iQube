@@ -44,4 +44,7 @@ router
   .get(asyncError(advertController.fetchAllAdverts));
 
 router.route('/admin/advert/:id').get(asyncError(advertController.fetchAdvert));
+router
+  .route('/admin/unlink/device')
+  .post(asyncError(adminController.unlinkUserDevice));
 export { router };
