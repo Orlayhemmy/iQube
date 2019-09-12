@@ -42,6 +42,7 @@
     "nodemon": "^1.19.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
+    "tinify": "^1.6.0-beta.2",
     "typescript": "^3.5.2"
   }
 }
