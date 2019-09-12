@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import * as db from '../models';
 import { validator } from '../errorhandler/errorhandler';
-import request = require('request');
+import * as tinify from 'tinify'
+tinify.key = 'xSybnjt81B9BGySlpTbjzmFkkRmst1XC'
 
 export const createAdvert = async (req: Request, res: Response) => {
   if (!req.files)
@@ -23,7 +24,11 @@ export const createAdvert = async (req: Request, res: Response) => {
   if (err.length >= 1)
     return res.status(400).json({ status: 400, message: err });
 
-  let buf = Buffer.from(req.files.advertImage.data);
+ let compress = await tinify.fromBuffer(req.files.advertImage.data)
+  let output = await compress.toBuffer()
+
+
+  let buf = Buffer.from(output);
   let base64 = buf.toString('base64');
 
   let modules = ['mybank', 'atease', 'pension', 'mutual', 'insurance'];
@@ -33,6 +38,18 @@ export const createAdvert = async (req: Request, res: Response) => {
       status: 400,
       message: `module can either be mybank, atease, pension, mutual, or insurance`
     });
+  
+  if(req.body.module === 'mybank') {
+    req.body.index = 0
+  } else if(req.body.module === 'mutual') {
+    req.body.index = 1
+  } else if(req.body.module === 'pension') {
+    req.body.index = 2
+  } else if(req.body.module === 'atease') {
+    req.body.index = 3
+  } else if(req.body.module === 'insurance') {
+    req.body.index = 4
+  }
 
   req.body.advertImage = base64;
   let advert = await db.Advert.findOne({ module: req.body.module });
