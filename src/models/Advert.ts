@@ -14,7 +14,8 @@ const advertSchema: Schema = new Schema(
     module: String,
     text: String,
     link: String,
-    title: String
+    title: String,
+    index: Number
   },
   { timestamps: true }
 );
