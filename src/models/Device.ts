@@ -6,6 +6,7 @@ export interface Device extends Document {
   deviceOS: string;
   userID: string;
   isUnlinked: boolean;
+  deviceNotificationToken: string;
 }
 
 const deviceSchema: Schema = new Schema(
@@ -14,7 +15,8 @@ const deviceSchema: Schema = new Schema(
     deviceName: String,
     deviceOS: String,
     user: { type: Schema.Types.ObjectId, ref: 'User' },
-    isUnLinked: { type: Boolean, default: false }
+    isUnLinked: { type: Boolean, default: false },
+    deviceNotificationToken: String
   },
   { timestamps: true }
 );
