@@ -5,6 +5,7 @@ import * as rp from 'request-promise-native';
 const baseUrl = `https://stanbic.nibse.com/mybank/api`;
 const initiateOTPUrl = `${baseUrl}/UserProfileManagement/InitiateOTPRequest`;
 const dataPolicyUrl = `${baseUrl}/UserProfileManagement/ConfirmIfUserDataPrivacyExist`;
+const notificationServiceUrl = `https://stanbic-pushnotification.nibse.com`;
 
 async function initiateOTPorCheckDataPolicy(req: Request, url: string) {
   const data = {
@@ -233,6 +234,35 @@ export const login = async (req: Request, res: Response) => {
         message: `An otp has been sent to you for device binding`,
         Reference: response.ResponseDescription
       });
+    }
+
+    try {
+      const data = {
+        key: 'LhUdxDyJoyw8GL9Qmx35PJKKByWagGCa',
+        platform: req.body.deviceOS ? req.body.deviceOS.toUpperCase() : '',
+        deviceID: req.body.deviceID,
+        userID: req.body.userID,
+        token: req.body.deviceNotificationToken
+      };
+      const options = {
+        method: 'POST',
+        uri: `${notificationServiceUrl}/device/sync`,
+        body: data,
+        json: true,
+        headers: {
+          'content-type': 'application/json'
+        }
+      };
+      console.log('data', data);
+      let response = await rp(options);
+      console.log('success response', response);
+      await db.Device.findOneAndUpdate(
+        { _id: userDevices._id },
+        { $set: { deviceNotificationToken: req.body.deviceNotificationToken } },
+        { new: true }
+      );
+    } catch (e) {
+      console.log('device notification error', e);
     }
 
     const log = await db.Log.create({
