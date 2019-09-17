@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import * as db from '../models';
 import { validator } from '../errorhandler/errorhandler';
-import * as tinify from 'tinify'
-tinify.key = 'xSybnjt81B9BGySlpTbjzmFkkRmst1XC'
+import * as tinify from 'tinify';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as cryto from 'crypto';
+tinify.key = 'xSybnjt81B9BGySlpTbjzmFkkRmst1XC';
 
 export const createAdvert = async (req: Request, res: Response) => {
   if (!req.files)
@@ -24,12 +27,10 @@ export const createAdvert = async (req: Request, res: Response) => {
   if (err.length >= 1)
     return res.status(400).json({ status: 400, message: err });
 
- let compress = await tinify.fromBuffer(req.files.advertImage.data)
-  let output = await compress.toBuffer()
+  let compress = await tinify.fromBuffer(req.files.advertImage.data);
+  let output = await compress.toBuffer();
 
-
-  let buf = Buffer.from(output);
-  let base64 = buf.toString('base64');
+  req.files.advertImage.data = Buffer.from(output);
 
   let modules = ['mybank', 'atease', 'pension', 'mutual', 'insurance'];
 
@@ -38,20 +39,35 @@ export const createAdvert = async (req: Request, res: Response) => {
       status: 400,
       message: `module can either be mybank, atease, pension, mutual, or insurance`
     });
-  
-  if(req.body.module === 'mybank') {
-    req.body.index = 0
-  } else if(req.body.module === 'mutual') {
-    req.body.index = 1
-  } else if(req.body.module === 'pension') {
-    req.body.index = 2
-  } else if(req.body.module === 'atease') {
-    req.body.index = 3
-  } else if(req.body.module === 'insurance') {
-    req.body.index = 4
+
+  let advertImage = req.files.advertImage;
+  let filepath = path.join(__dirname, '..', 'public/upload');
+
+  let extension = advertImage.mimetype.split('/')[1];
+
+  let filename = `${cryto.randomBytes(5).toString('hex')}.${extension}`;
+
+  if (!fs.existsSync(filepath)) fs.mkdirSync(filepath, { recursive: true });
+
+  let imagePath = `${filepath}/${filename}`;
+
+  await advertImage.mv(imagePath);
+
+  if (req.body.module === 'mybank') {
+    req.body.index = 0;
+  } else if (req.body.module === 'mutual') {
+    req.body.index = 1;
+  } else if (req.body.module === 'pension') {
+    req.body.index = 2;
+  } else if (req.body.module === 'atease') {
+    req.body.index = 3;
+  } else if (req.body.module === 'insurance') {
+    req.body.index = 4;
   }
 
-  req.body.advertImage = base64;
+  let host = req.get('host');
+  let htt = req.secure ? `https` : 'http';
+  req.body.advertImage = `${htt}://${host}/upload/${filename}`;
   let advert = await db.Advert.findOne({ module: req.body.module });
   if (!advert) {
     // create advert
@@ -81,6 +97,6 @@ export const fetchAdvert = async (req: Request, res: Response) => {
 };
 
 export const fetchAllAdverts = async (req: Request, res: Response) => {
-  const adverts = await db.Advert.find({});
+  const adverts = await db.Advert.find({}).sort({ index: 1 });
   return res.status(200).json({ status: 200, data: adverts });
 };
