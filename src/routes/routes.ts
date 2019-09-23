@@ -5,6 +5,7 @@ import * as transaction from '../controllers/transactionHistory';
 import * as beneficiaryController from '../controllers/beneficiary';
 import * as adminController from '../controllers/admin';
 import * as advertController from '../controllers/advert';
+import * as atEaseUser from '../controllers/@easesUser';
 const router = Router();
 
 router.route('/device/binding').post(asyncError(user.deviceBinding));
@@ -13,6 +14,10 @@ router.route('/transaction/history').post(asyncError(transaction.sortHistory));
 router.route('/device/all').post(asyncError(user.viewAllBindedDevices));
 router.route('/device/unlink').post(asyncError(user.unlinkDevice));
 router.route('/device/sendotp').post(asyncError(user.sendOTPforUnLinkDevice));
+
+router.route('/atease/device/login').post(asyncError(atEaseUser.login));
+router.route('/atease/device/link').post(asyncError(atEaseUser.bindDevice));
+router.route('/atease/device/unlink').post(asyncError(atEaseUser.unlinkDevice));
 
 router
   .route('/mybank/edit/beneficiary')
