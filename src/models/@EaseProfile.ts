@@ -4,20 +4,17 @@ import { Device } from './Device';
 export interface UserAtEase extends Document {
   userID: string;
   profilePicture: string;
-  deviceID: string;
-  deviceName: string;
-  deviceOS: string;
+  device: [Device['_id']];
 }
 
 const userSchema = new Schema(
   {
     userID: { type: String, index: true },
     profilePicture: { type: String, default: '' },
-    deviceID: String,
-    deviceName: String,
-    deviceOS: String
+    device: [{ type: Schema.Types.ObjectId, ref: 'AtEaseDevice' }]
   },
   { timestamps: true }
 );
 
+userSchema.index({ userID: 'text' });
 export default model<UserAtEase>('UserAtEase', userSchema);
