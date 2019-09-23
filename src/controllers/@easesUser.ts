@@ -150,7 +150,8 @@ export const login = async (req: Request, res: Response) => {
       }
       return res.status(200).json({
         status: 202,
-        message: `An otp has been sent to you for device binding`
+        message: `An otp has been sent to you for device binding`,
+        OTPReference: response.Reference
       });
     }
     const userDevice = await db.AtEaseDevice.findOne({
@@ -166,7 +167,8 @@ export const login = async (req: Request, res: Response) => {
       }
       return res.status(200).json({
         status: 202,
-        message: `An otp has been sent to you for device binding`
+        message: `An otp has been sent to you for device binding`,
+        OTPReference: response.Reference
       });
     }
 
