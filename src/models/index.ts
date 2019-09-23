@@ -23,3 +23,4 @@ export { default as Log } from './Log';
 export { default as Beneficiary } from './Beneficiary';
 export { default as AtEaseUser } from './@EaseProfile';
 export { default as Advert } from './Advert';
+export { default as AtEaseDevice } from './@EaseDevice';
