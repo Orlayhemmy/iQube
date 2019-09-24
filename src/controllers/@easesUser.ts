@@ -58,12 +58,12 @@ export const bindDevice = async (req: Request, res: Response) => {
       let UserId = req.body.UserId;
 
       let user = await db.AtEaseUser.findOne({
-        UserId
+        userID: UserId
       });
       if (!user) {
         // create user
         user = await db.AtEaseUser.create({
-          UserId
+          userID: UserId
         });
       }
       // check that device is not binded to more than one profile(userId)
@@ -102,7 +102,7 @@ export const bindDevice = async (req: Request, res: Response) => {
           });
         }
         // update the user model with the device id
-        let updatingUserSchema = await db.User.findOneAndUpdate(
+        let updatingUserSchema = await db.AtEaseUser.findOneAndUpdate(
           { _id: user._id },
           { $addToSet: { device: device._id } },
           { new: true }
@@ -123,7 +123,7 @@ export const bindDevice = async (req: Request, res: Response) => {
     }
     return res
       .status(400)
-      .json({ status: 400, message: `Unable to validate OTP` });
+      .json({ status: 400, message: response.ResponseFriendlyMessage });
   } catch (e) {
     if (e.statusCode)
       return res
@@ -223,7 +223,7 @@ export const unlinkDevice = async (req: Request, res: Response) => {
             message: `Could not unlink Device because it is not currently linked`
           });
         // unlink device from device account
-        await db.Device.findOneAndUpdate(
+        await db.AtEaseDevice.findOneAndUpdate(
           { _id: device._id },
           { isUnLinked: true },
           { new: true }
@@ -245,7 +245,7 @@ export const unlinkDevice = async (req: Request, res: Response) => {
     }
     return res.status(400).json({
       status: 400,
-      message: `Could not validate OTP`
+      message: response.ResponseFriendlyMessage
     });
   } catch (e) {
     if (e.statusCode)
