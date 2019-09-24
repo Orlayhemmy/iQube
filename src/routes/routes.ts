@@ -20,6 +20,12 @@ router.route('/atease/device/link').post(asyncError(atEaseUser.bindDevice));
 router.route('/atease/device/unlink').post(asyncError(atEaseUser.unlinkDevice));
 
 router
+  .route('/atease/addprofile')
+  .post(asyncError(atEaseUser.addOrUpdateProfileImage));
+
+router.route('/atease/viewprofile').post(asyncError(atEaseUser.fetchImage));
+
+router
   .route('/mybank/edit/beneficiary')
   .post(asyncError(beneficiaryController.editBeneficiary));
 router

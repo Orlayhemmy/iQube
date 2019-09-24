@@ -255,3 +255,41 @@ export const unlinkDevice = async (req: Request, res: Response) => {
     return res.status(400).json({ status: 400, message: e.message });
   }
 };
+
+export const addOrUpdateProfileImage = async (req: Request, res: Response) => {
+  if (!req.body.UserId)
+    return res
+      .status(400)
+      .json({ status: 400, message: `Please enter UserId` });
+
+  let image = req.body.image || '';
+  // check if user exists
+  const user = await db.AtEaseUser.findOne({ userID: req.body.UserId });
+  if (!user) {
+    await db.AtEaseUser.create({
+      userID: req.body.UserId,
+      profilePicture: image
+    });
+  } else {
+    await db.AtEaseUser.findOneAndUpdate(
+      { _id: user.id },
+      { $set: { profilePicture: image } },
+      { new: true }
+    );
+  }
+
+  return res
+    .status(200)
+    .json({ status: 200, message: `Image successfully added` });
+};
+
+export const fetchImage = async (req: Request, res: Response) => {
+  if (!req.body.UserId)
+    return res
+      .status(400)
+      .json({ status: 400, message: `Please enter UserId` });
+
+  const user = await db.AtEaseUser.findOne({ userID: req.body.UserId });
+  let image = user ? user.profilePicture : '';
+  return res.status(200).json({ status: 200, data: { profilePicture: image } });
+};
