@@ -155,7 +155,7 @@ export const login = async (req: Request, res: Response) => {
       });
     }
     const userDevice = await db.AtEaseDevice.findOne({
-      userID: req.body.UserId,
+      user: user._id,
       deviceID: req.body.deviceID,
       isUnLinked: false
     });
