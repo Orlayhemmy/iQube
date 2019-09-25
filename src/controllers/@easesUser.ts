@@ -118,13 +118,15 @@ export const bindDevice = async (req: Request, res: Response) => {
       }
       return res.status(400).json({
         status: 400,
-        message: `You already have 5 devices bounded to this account, please unlink one to add this`
+        message: `You already have 1 profile linked to this device, please unlink to add this`
       });
     }
+    console.log(response.ResponseFriendlyMessage)
     return res
       .status(400)
       .json({ status: 400, message: response.ResponseFriendlyMessage });
   } catch (e) {
+    console.log(e)
     if (e.statusCode)
       return res
         .status(e.statusCode)
