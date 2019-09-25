@@ -36,6 +36,7 @@ export const bindDevice = async (req: Request, res: Response) => {
       'UserId'
     ];
     let err = validator(inputs, req.body);
+    console.log(err)
     if (err.length >= 1)
       return res.status(400).json({ status: 400, message: err });
 
@@ -73,6 +74,7 @@ export const bindDevice = async (req: Request, res: Response) => {
       });
 
       if (devices.length && devices.length >= 1) {
+        console.log('error occured here')
         return res.status(400).json({
           status: 400,
           message: `You already have 1 profile linked to this device, please unlink to add this`
@@ -116,6 +118,7 @@ export const bindDevice = async (req: Request, res: Response) => {
           }
         });
       }
+      console.log('device already linked')
       return res.status(400).json({
         status: 400,
         message: `You already have 1 profile linked to this device, please unlink to add this`
