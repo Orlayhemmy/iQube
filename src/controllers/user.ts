@@ -105,7 +105,11 @@ export const deviceBinding = async (req: Request, res: Response) => {
       let user = await db.User.findOne({ userID });
       if (!user) {
         // create user
-        user = await db.User.create({ userID });
+        user = await db.User.create({
+          userID,
+          FirstName: req.body.FirstName,
+          LastName: req.body.LastName
+        });
       }
 
       // check that device is not binded to more than five profiles(userId)
@@ -242,7 +246,8 @@ export const login = async (req: Request, res: Response) => {
         platform: req.body.deviceOS ? req.body.deviceOS.toUpperCase() : '',
         deviceID: req.body.deviceID,
         userID: req.body.userID,
-        token: req.body.deviceNotificationToken
+        token: req.body.deviceNotificationToken,
+        module: 'mybank'
       };
       const options = {
         method: 'POST',
@@ -261,14 +266,35 @@ export const login = async (req: Request, res: Response) => {
         { $set: { deviceNotificationToken: req.body.deviceNotificationToken } },
         { new: true }
       );
+
+      // update user FirstName and LastName
+      await db.User.findOneAndUpdate(
+        { userID: req.body.userID },
+        { FirstName: req.body.FirstName, LastName: req.body.LastName }
+      );
     } catch (e) {
       console.log('device notification error', e);
+    }
+    let isFirstLogin: boolean = false;
+    let firstLoginDate: Date = new Date();
+    // check if it's first login
+    let firstLoginExists = await db.Log.findOne({
+      userID: req.body.userID,
+      isFirstLogin: true
+    });
+    if (!firstLoginExists) {
+      isFirstLogin = true;
+    } else {
+      firstLoginDate = firstLoginExists.firstLoginDate;
     }
 
     const log = await db.Log.create({
       userID: req.body.userID,
       device: userDevices._id,
-      status: 'successful'
+      status: 'successful',
+      isFirstLogin,
+      firstLoginDate,
+      lastLoginDate: new Date()
     });
 
     return res.status(200).json({
