@@ -268,10 +268,12 @@ export const login = async (req: Request, res: Response) => {
       );
 
       // update user FirstName and LastName
-      await db.User.findOneAndUpdate(
-        { userID: req.body.userID },
-        { FirstName: req.body.FirstName, LastName: req.body.LastName }
-      );
+      if (req.body.FirstName && req.body.LastName) {
+        await db.User.findOneAndUpdate(
+          { userID: req.body.userID },
+          { FirstName: req.body.FirstName, LastName: req.body.LastName }
+        );
+      }
     } catch (e) {
       console.log('device notification error', e);
     }
