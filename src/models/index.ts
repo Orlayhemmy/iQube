@@ -13,6 +13,8 @@ const options = {
 
 mongoose.connect(`${process.env.MONGO_URI_STAGING}`, options);
 
+mongoose.set('debug', true)
+
 mongoose.connection.on('err', err => {
   console.error(console.error(`🙅 🚫 🙅 🚫 🙅 🚫 🙅 🚫 → ${err.message}`));
 });

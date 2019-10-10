@@ -36,7 +36,7 @@ export const bindDevice = async (req: Request, res: Response) => {
       'UserId'
     ];
     let err = validator(inputs, req.body);
-    console.log(err)
+    console.log(err);
     if (err.length >= 1)
       return res.status(400).json({ status: 400, message: err });
 
@@ -74,7 +74,7 @@ export const bindDevice = async (req: Request, res: Response) => {
       });
 
       if (devices.length && devices.length >= 1) {
-        console.log('error occured here')
+        console.log('error occured here');
         return res.status(400).json({
           status: 400,
           message: `You already have 1 profile linked to this device, please unlink to add this`
@@ -118,18 +118,18 @@ export const bindDevice = async (req: Request, res: Response) => {
           }
         });
       }
-      console.log('device already linked')
+      console.log('device already linked');
       return res.status(400).json({
         status: 400,
         message: `You already have 1 profile linked to this device, please unlink to add this`
       });
     }
-    console.log(response.ResponseFriendlyMessage)
+    console.log(response.ResponseFriendlyMessage);
     return res
       .status(400)
       .json({ status: 400, message: response.ResponseFriendlyMessage });
   } catch (e) {
-    console.log(e)
+    console.log(e);
     if (e.statusCode)
       return res
         .status(e.statusCode)
@@ -187,6 +187,28 @@ export const login = async (req: Request, res: Response) => {
         .json({ status: e.statusCode, message: e.message });
     return res.status(400).json({ status: 400, message: e.message });
   }
+};
+
+export const viewAllBindedDevices = async (req: Request, res: Response) => {
+  let inputs = ['userID'];
+  let err = validator(inputs, req.body);
+  if (err.length >= 1)
+    return res.status(400).json({ status: 400, message: err });
+
+  const usersDevices = await db.AtEaseUser.findOne(
+    {
+      userID: req.body.userID
+    },
+    { profilePicture: 0 }
+  ).populate('device', 'deviceID deviceName deviceOS');
+
+  if (usersDevices)
+    return res.status(200).json({ status: 200, data: usersDevices });
+
+  return res.status(400).json({
+    status: 400,
+    message: `You have no devices linked to this account`
+  });
 };
 
 export const unlinkDevice = async (req: Request, res: Response) => {

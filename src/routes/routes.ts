@@ -18,6 +18,7 @@ router.route('/device/sendotp').post(asyncError(user.sendOTPforUnLinkDevice));
 router.route('/atease/device/login').post(asyncError(atEaseUser.login));
 router.route('/atease/device/link').post(asyncError(atEaseUser.bindDevice));
 router.route('/atease/device/unlink').post(asyncError(atEaseUser.unlinkDevice));
+router.route('/atease/device/all').post(asyncError(atEaseUser.viewAllBindedDevices));
 
 router
   .route('/atease/addprofile')
