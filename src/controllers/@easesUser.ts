@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import * as db from '../models';
 import { validator } from '../errorhandler/errorhandler';
 import * as rp from 'request-promise-native';
-const baseUrl = `https://stanbic.nibse.com/mybank/api`;
+// const baseUrl = `https://stanbic.nibse.com/mybank/api`;
+const baseUrl = `https://ibankingpilot.stanbicibtcbank.com/api`;
 let initiateOTPURL = `${baseUrl}/UserProfileManagement/InitiateVBOTP`;
 let validateOTPURL = `${baseUrl}/UserProfileManagement/ValidateVBOTP`;
 
