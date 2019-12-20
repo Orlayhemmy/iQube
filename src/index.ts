@@ -11,6 +11,8 @@ import { guard } from './middleware/gaurd';
 dotenv.config({ path: 'application.env' });
 const app = express();
 
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+
 app.use(helmet());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
