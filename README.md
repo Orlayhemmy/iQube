@@ -17,6 +17,14 @@ TODO: Explain how other users and developers can contribute to make your code be
 
 ### BASE URL - https://stanbic-profile.nibse.com
 
+```js
+{
+    Authorization: `Bearer  a1f94dfe0b38c6fe98b68f754389c781f7836b0074cf61eee749ae1c989a218a`
+}
+
+```
+
+
 - **POST** - /api/login/logs - Check Data Policy and Device Binding
 
   - **params**:
@@ -53,3 +61,110 @@ If response has a `status 200`, user can proceed to the dashboard.
   For user to unlink device if they’re not logged in, You take their userId and password, attempt login and call the OTP endpoint to send otp to them.
   Then after, call this endpoint to unlink device
 
+- **POST** - /api/device/all - View all user's linked devices
+
+  - **param**:
+    - **userID**: `String`
+
+
+- **POST** - /api/mybank/add/beneficiary - Add Beneficiary
+
+  - **params**:
+    - **userId**: `String`
+    - **beneficiaryAlias**: `String`
+    - **beneficiaryName**: `String`
+    - **beneficiaryAccountNumber**: `String`
+    - **beneficiaryBank**:`String`
+    - **beneficiaryBankCode**: `String`
+    - **beneficiaryEmailAddress**: `String`
+    - **beneficiaryReference**: `String`
+    - **customerReference**: `String`
+    - **otp**: `String`
+    - **otpReference**: `String`
+    - **Token**:  `String`
+    - **Image**: `String` - Base64 Image of the beneficiary
+
+
+- **POST** - /edit/beneficiary - Edit Beneficiary
+
+  - **params**:
+    - **sessionId**: `String`
+    - **UserId**: `String`
+    - **beneficiaryReference**: `String`
+    - **OTP**: `String`
+    - **BeneficiaryId**: `String`
+    - **SourceReferenceId**: `String`
+    - **customerReference**:  `String`
+    - **Token**: `String`
+    - **image** : `String`
+
+- **POST** - /api/mybank/fetch/beneficiary - Fetch Beneficiary
+
+  - **params**:
+    - **AccountNo**: `String`
+    - **UserId**: `String`
+    - **Token**: `String`
+
+- **POST** - /api/transaction/history - fetching transaction history
+
+  - **params**:
+    - **AccountNumber**: `String` - Account number you want history for
+	  - **UserId**: `String`
+	  - **Token**: `String` - Your logged in token
+
+
+- **POST** - /api/mybank/addprofile - ADD PROFILE PICTURE
+
+  - **params**:
+    - **userID**: `String`
+	  - **image**: `String` Base64 image
+
+- **POST** - /api/mybank/viewprofile - VIEW PROFILE PICTURE
+
+  - **params**:
+    - **userID**: `String`
+
+- **POST** - /api/atease/device/link - Device Linking For @ease
+
+  - **params:
+    - **UserId**: `String`
+	  - **deviceID**: `String`
+	  - **deviceName**: `String`
+	  - **deviceOS**: `String`
+	  - **OTP**: `String`
+	  - **OTPReference**: `String`
+
+
+- **POST** - /api/atease/device/login - @ease Login logs
+
+  - **params**:
+    - **UserId**: `String`
+	  - **deviceID**: `String`
+
+If response has a `status 202`, that means user has not done device binding. An OTP is sent to the user and a reference is also returned.  
+If response has a `status 200`, user can proceed to the dashboard.
+
+- **POST** - /api/atease/device/unlink - To Unlink Device
+
+  - **params**:
+    - **UserId**: `String`
+	  - **deviceID**: `String`
+	  - **OTP**: `String`
+	  - **OTPReference**: `String`
+
+
+- **POST** - /api/atease/device/all - To view linked devices
+
+  - **params**:
+    - **userID**: `String`
+
+- **POST** - /api/atease/addprofile - Add user’s profile image
+
+  - **params**:
+    - **UserId**: `String`
+	  - **image**: `String` base64 image
+
+- **POST** - /api/atease/viewprofile - View user’s profile image
+
+  - **params**:
+    - **UserId**: `String`
