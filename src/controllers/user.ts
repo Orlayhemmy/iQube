@@ -34,6 +34,27 @@ async function initiateOTPorCheckDataPolicy(req: Request, url: string) {
   return await rp(options);
 }
 
+async function validateDeviceBindingOTP(req: Request, url: string) {
+  const data = {
+    UserId: req.body.userID,
+    Otp: req.body.Otp,
+    Reference: req.body.Reference,
+    CIF: req.body.CIF
+  };
+  const options = {
+    method: 'POST',
+    uri: validateOTPURL,
+    body: data,
+    json: true,
+    headers: {
+      'content-type': 'application/json',
+      'X-STC-AGENT-CACHE': req.body.userID,
+      Authorization: `Bearer ${req.body.Token}`
+    }
+  };
+  return await rp(options);
+}
+
 export const addOrUpdateProfileImage = async (req: Request, res: Response) => {
   if (!req.body.userID)
     return res
@@ -85,24 +106,7 @@ export const deviceBinding = async (req: Request, res: Response) => {
       return res.status(400).json({ status: 400, message: err });
 
     // validate otp
-    const validateOTPURL = `${baseUrl}/UserProfileManagement/ValidateOTP`;
-    const data = {
-      UserId: req.body.userID,
-      Otp: req.body.Otp,
-      Reference: req.body.Reference
-    };
-    const options = {
-      method: 'POST',
-      uri: validateOTPURL,
-      body: data,
-      json: true,
-      headers: {
-        'content-type': 'application/json',
-        'X-STC-AGENT-CACHE': req.body.userID,
-        Authorization: `Bearer ${req.body.Token}`
-      }
-    };
-    let response = await rp(options);
+    let response = await validateDeviceBindingOTP(req, validateOTPURL);
     // a device can be binded to five accounts
     // and you can have five accounts binded to one device
     if (response.ResponseCode == '00') {
@@ -367,24 +371,9 @@ export const unlinkDevice = async (req: Request, res: Response) => {
     let err = validator(inputs, req.body);
     if (err.length >= 1)
       return res.status(400).json({ status: 400, message: err });
-    const validateOTPURL = `${baseUrl}/UserProfileManagement/ValidateOTP`;
-    const data = {
-      UserId: req.body.userID,
-      Otp: req.body.Otp,
-      Reference: req.body.Reference
-    };
-    const options = {
-      method: 'POST',
-      uri: validateOTPURL,
-      body: data,
-      json: true,
-      headers: {
-        'content-type': 'application/json',
-        'X-STC-AGENT-CACHE': req.body.userID,
-        Authorization: `Bearer ${req.body.Token}`
-      }
-    };
-    let response = await rp(options);
+
+      
+    let response = await validateDeviceBindingOTP(req, validateOTPURL);
 
     if (response.ResponseCode == '00') {
       // find device and update status
