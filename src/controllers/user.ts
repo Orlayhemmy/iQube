@@ -221,10 +221,16 @@ export const login = async (req: Request, res: Response) => {
 
     if (!user) {
       // initiate otp
-      let response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+      let response = await initiateOTPorCheckDataPolicy(
+        req,
+        initiateDeviceBindingOTPURL
+      );
       if (response.ResponseCode != '00') {
         // try resending otp again
-        response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+        response = await initiateOTPorCheckDataPolicy(
+          req,
+          initiateDeviceBindingOTPURL
+        );
       }
       return res.status(200).json({
         status: 202,
@@ -240,10 +246,16 @@ export const login = async (req: Request, res: Response) => {
 
     if (!userDevices) {
       // initiate otp
-      let response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+      let response = await initiateOTPorCheckDataPolicy(
+        req,
+        initiateDeviceBindingOTPURL
+      );
       if (response.ResponseCode != '00') {
         // try resending otp again
-        response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+        response = await initiateOTPorCheckDataPolicy(
+          req,
+          initiateDeviceBindingOTPURL
+        );
       }
       return res.status(200).json({
         status: 202,
@@ -353,10 +365,13 @@ export const sendOTPforUnLinkDevice = async (req: Request, res: Response) => {
       message: err
     });
 
-  let response = await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+  let response = await initiateOTPorCheckDataPolicy(
+    req,
+    initiateDeviceBindingOTPURL
+  );
   if (response.ResponseCode != '00') {
     // try resending otp again
-    await initiateOTPorCheckDataPolicy(req, initiateOTPUrl);
+    await initiateOTPorCheckDataPolicy(req, initiateDeviceBindingOTPURL);
   }
   return res.status(200).json({
     status: 200,
