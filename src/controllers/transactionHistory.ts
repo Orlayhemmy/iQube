@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import * as rp from 'request-promise-native';
 import { validator } from '../errorhandler/errorhandler';
+const baseUrl = `https://ibankingpilot.stanbicibtcbank.com/api`;
+const historyUrl =
+  `${baseUrl}/TransactionManagement/GetTransactionDetailsByAccountNumberAndCount`;
 
 let yesterday = (): string =>
   new Date(new Date().setDate(new Date().getDate() - 1)).toDateString();
@@ -29,7 +32,7 @@ export const sortHistory = async (req: Request, res: Response) => {
     };
     const options = {
       method: 'POST',
-      uri: `https://stanbic.nibse.com/mybank/api/TransactionManagement/GetTransactionDetailsByAccountNumberAndCount`,
+      uri: historyUrl,
       body: data,
       json: true,
       headers: {
