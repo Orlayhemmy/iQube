@@ -6,6 +6,7 @@ import * as rp from 'request-promise-native';
 const baseUrl = `https://ibankingpilot.stanbicibtcbank.com/api`;
 const initiateOTPUrl = `${baseUrl}/UserProfileManagement/InitiateOTPRequest`;
 const dataPolicyUrl = `${baseUrl}/UserProfileManagement/ConfirmIfUserDataPrivacyExist`;
+const initiateDeviceBindingOTPURL = `${baseUrl}/UserProfileManagement/InitiateDeviceBindingOTP`;
 const notificationServiceUrl = `https://stanbic-pushnotification.nibse.com`;
 
 async function initiateOTPorCheckDataPolicy(req: Request, url: string) {
