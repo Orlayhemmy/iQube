@@ -19,7 +19,6 @@ async function initiateOTPorCheckDataPolicy(req: Request, url: string) {
     data.ReasonCode = 20;
     data.ReasonDescription = 'Bind Device';
   }
-  console.log('data', data);
   const options = {
     method: 'POST',
     uri: url,
@@ -39,7 +38,7 @@ async function validateDeviceBindingOTP(req: Request, url: string) {
     UserId: req.body.userID,
     Otp: req.body.Otp,
     Reference: req.body.Reference,
-    CIF: req.body.CIF
+    CifId: req.body.CifId
   };
   const options = {
     method: 'POST',
@@ -282,9 +281,7 @@ export const login = async (req: Request, res: Response) => {
           'content-type': 'application/json'
         }
       };
-      console.log('data', data);
       let response = await rp(options);
-      console.log('success response', response);
       await db.Device.findOneAndUpdate(
         { _id: userDevices._id },
         { $set: { deviceNotificationToken: req.body.deviceNotificationToken } },
