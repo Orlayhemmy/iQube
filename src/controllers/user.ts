@@ -8,6 +8,7 @@ const initiateOTPUrl = `${baseUrl}/UserProfileManagement/InitiateOTPRequest`;
 const dataPolicyUrl = `${baseUrl}/UserProfileManagement/ConfirmIfUserDataPrivacyExist`;
 const initiateDeviceBindingOTPURL = `${baseUrl}/UserProfileManagement/InitiateDeviceBindingOTP`;
 const notificationServiceUrl = `https://stanbic-pushnotification.nibse.com`;
+const validateOTPURL = `${baseUrl}/UserProfileManagement/ValidateDeviceBindingOTP`;
 
 async function initiateOTPorCheckDataPolicy(req: Request, url: string) {
   const data = {
