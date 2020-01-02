@@ -11,10 +11,15 @@ const notificationServiceUrl = `https://stanbic-pushnotification.nibse.com`;
 const validateOTPURL = `${baseUrl}/UserProfileManagement/ValidateDeviceBindingOTP`;
 
 async function initiateOTPorCheckDataPolicy(req: Request, url: string) {
-  const data = {
+  let data: any = {
     UserId: req.body.userID,
     CifId: req.body.CifId
   };
+  if (url === initiateDeviceBindingOTPURL) {
+    data.ReasonCode = 20;
+    data.ReasonDescription = 'Bind Device';
+  }
+  console.log('data', data);
   const options = {
     method: 'POST',
     uri: url,
