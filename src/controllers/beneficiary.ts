@@ -30,7 +30,8 @@ export const editBeneficiary = async (req: Request, res: Response) => {
       OTP: req.body.OTP,
       BeneficiaryId: req.body.BeneficiaryId,
       SourceReferenceId: '',
-      customerReference: req.body.customerReference
+      customerReference: req.body.customerReference,
+      XMB: 1
     };
     const options = {
       method: 'POST',
@@ -166,7 +167,8 @@ export const addBeneficiary = async (req: Request, res: Response) => {
       beneficiaryReference: req.body.beneficiaryReference,
       customerReference: req.body.customerReference,
       otp: req.body.otp,
-      otpReference: ''
+      otpReference: '',
+      XMB: 1
     };
 
     const options = {
