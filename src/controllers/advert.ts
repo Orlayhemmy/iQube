@@ -6,17 +6,18 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as cryto from 'crypto';
 tinify.key = 'xSybnjt81B9BGySlpTbjzmFkkRmst1XC';
+import { UploadedFile } from 'express-fileupload';
 
 export const createAdvert = async (req: Request, res: Response) => {
   if (!req.files)
     return res.status(400).json({ status: 400, message: 'No image selected' });
-
   if (!req.files.advertImage)
     return res
       .status(400)
       .json({ status: 400, message: `Please select an image to upload` });
 
-  if (!req.files.advertImage.mimetype.includes('image/'))
+   let advertImage = req.files.advertImage as UploadedFile
+  if (!advertImage.mimetype.includes('image/'))
     return res
       .status(400)
       .json({ status: 400, message: `only images allowed for upload` });
@@ -27,10 +28,10 @@ export const createAdvert = async (req: Request, res: Response) => {
   if (err.length >= 1)
     return res.status(400).json({ status: 400, message: err });
 
-  let compress = await tinify.fromBuffer(req.files.advertImage.data);
+  let compress = await tinify.fromBuffer(advertImage.data);
   let output = await compress.toBuffer();
 
-  req.files.advertImage.data = Buffer.from(output);
+  advertImage.data = Buffer.from(output);
 
   let modules = ['mybank', 'atease', 'pension', 'mutual', 'insurance'];
 
@@ -40,7 +41,7 @@ export const createAdvert = async (req: Request, res: Response) => {
       message: `module can either be mybank, atease, pension, mutual, or insurance`
     });
 
-  let advertImage = req.files.advertImage;
+  // let advertImage = req.files.advertImage;
   let filepath = path.join(__dirname, '..', 'public/upload');
 
   let extension = advertImage.mimetype.split('/')[1];
