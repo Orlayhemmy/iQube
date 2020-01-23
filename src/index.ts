@@ -7,12 +7,15 @@ import { notFound, prodError } from './errorhandler/errorhandler';
 import { router } from './routes/routes';
 import * as path from 'path';
 import { guard } from './middleware/gaurd';
+import * as SwaggerDoc from './openapi.json'
+import * as SwaggerUI from 'swagger-ui-express'
 
 dotenv.config({ path: 'application.env' });
 const app = express();
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
+app.use('/api-docs', SwaggerUI.serve, SwaggerUI.setup(SwaggerDoc));
 app.use(helmet());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
