@@ -9,16 +9,10 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "*": [
-        "node_modules/*",
-        "src/types/*"
-      ]
-    }
+      "*": ["node_modules/*", "src/types/*"]
+    },
+    "resolveJsonModule": true
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "src/**/*"
-  ]
+  "exclude": ["node_modules"],
+  "include": ["src/**/*"]
 }
