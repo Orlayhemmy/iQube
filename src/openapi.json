@@ -1,0 +1,316 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Profile Management",
+    "description": "Api Docs for the profile management service of the new stanbic IBTC mobile app",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5050/api"
+    }
+  ],
+  "paths": {
+    "/login/logs": {
+      "post": {
+        "summary": "check device has been linked",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "deviceID": { "type": "string" },
+                  "userID": { "type": "string" },
+                  "CifId": { "type": "string" },
+                  "Token": { "type": "string" },
+                  "deviceNotificationToken": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User has successfully binded"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/device/binding": {
+      "post": {
+        "summary": "link device to account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "deviceName": { "type": "string" },
+                  "deviceID": { "type": "string" },
+                  "deviceOS": { "type": "string" },
+                  "Otp": { "type": "string" },
+                  "Reference": { "type": "string" },
+                  "userID": { "type": "string" },
+                  "Token": { "type": "string" }
+                },
+                "required": [
+                  "deviceName",
+                  "deviceID",
+                  "deviceOS",
+                  "Otp",
+                  "Reference",
+                  "userID",
+                  "Token"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User's device was successfully linked"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/device/all": {
+      "post": {
+        "summary": "View all linked devices",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "userID": { "type": "string" }
+                },
+                "required": ["userID"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/device/unlink": {
+      "post": {
+        "summary": "Unlink a user's device from their account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "userID": { "type": "string" },
+
+                  "deviceID": { "type": "string" },
+
+                  "Otp": { "type": "string" },
+                  "Reference": { "type": "string" },
+                  "Token": { "type": "string" }
+                },
+                "required": ["userID"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/atease/device/login": {
+      "post": {
+        "summary": "Check if an @ease account has their device linked",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "UserId": { "type": "string" },
+                  "deviceID": { "type": "string" }
+                },
+                "required": ["UserId", "deviceID"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/atease/device/link": {
+      "post": {
+        "summary": "Link an @ease account to a device",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "UserId": { "type": "string" },
+                  "deviceID": { "type": "string" },
+                  "deviceName": { "type": "string" },
+                  "deviceOS": { "type": "string" },
+                  "OTP": { "type": "string" },
+                  "OTPReference": { "type": "string" }
+                },
+                "required": ["UserId", "deviceID"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/atease/device/unlink": {
+      "post": {
+        "summary": "Unlink a device linked to an @ease account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "UserId": { "type": "string" },
+                  "deviceID": { "type": "string" },
+                  "OTP": { "type": "string" },
+                  "OTPReference": { "type": "string" }
+                },
+                "required": ["UserId", "deviceID"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/atease/device/all": {
+      "post": {
+        "summary": "View the linked @ease device",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "userID": { "type": "string" }
+                },
+                "required": ["userID"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/atease/addprofile": {
+      "post": {
+        "summary": "Add or update a profile image for @ease",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "UserId": { "type": "string" },
+                  "image": { "type": "string" }
+                },
+                "required": ["UserId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/atease/viewprofile": {
+      "post": {
+        "summary": "View a profile image for @ease",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "UserId": { "type": "string" }
+                },
+                "required": ["UserId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "security": [{ "BearerAuth": [] }]
+}
