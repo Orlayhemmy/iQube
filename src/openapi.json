@@ -302,6 +302,183 @@
           }
         }
       }
+    },
+    "/mybank/add/beneficiary": {
+      "post": {
+        "summary": "Add Beneficiary for my bank",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "userId": { "type": "string" },
+                  "beneficiaryAlias": { "type": "string" },
+                  "beneficiaryName": { "type": "string" },
+                  "beneficiaryAccountNumber": { "type": "string" },
+                  "beneficiaryBank": { "type": "string" },
+                  "beneficiaryBankCode": { "type": "string" },
+                  "beneficiaryReference": { "type": "string" },
+                  "customerReference": { "type": "string" },
+                  "otp": { "type": "string" },
+                  "Token": { "type": "string" },
+                  "image": { "type": "string" }
+                },
+                "required": ["userId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/mybank/edit/beneficiary": {
+      "post": {
+        "summary": "Edit beneficiary for my bank",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "UserId": { "type": "string" },
+                  "beneficiaryReference": { "type": "string" },
+                  "BeneficiaryId": { "type": "string" },
+                  "customerReference": { "type": "string" },
+                  "OTP": { "type": "string" },
+                  "Token": { "type": "string" },
+                  "image": { "type": "string" }
+                },
+                "required": ["userId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/mybank/fetch/beneficiary": {
+      "post": {
+        "summary": "Fetch a user's beneficiaries for my bank",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "UserId": { "type": "string" },
+                  "AccountNo": { "type": "string" },
+                  "Token": { "type": "string" }
+                },
+                "required": ["userId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/mybank/addprofile": {
+      "post": {
+        "summary": "Add profile for a bank user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "userID": { "type": "string" },
+                  "image": { "type": "string" }
+                },
+                "required": ["userID"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/mybank/viewprofile": {
+      "post": {
+        "summary": "view profile for a bank user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "userID": { "type": "string" }
+                },
+                "required": ["userID"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
+    },
+    "/transaction/history": {
+      "post": {
+        "summary": "Sort transaction history into past week and today",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "UserId": { "type": "string" },
+                  "AccountNumber": { "type": "string" },
+                  "Token": { "type": "string" }
+                },
+                "required": ["UserId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful"
+          },
+          "401": {
+            "description": "No Authorization token provided"
+          }
+        }
+      }
     }
   },
   "components": {
