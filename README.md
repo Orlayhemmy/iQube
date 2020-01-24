@@ -15,8 +15,10 @@ TODO: Explain how other users and developers can contribute to make your code be
 
 # API Documentation
 
+
 ### BASE URL - https://stanbic-profile.nibse.com
 
+### SWAGGER DOC - /api-docs
 ```js
 {
     Authorization: `Bearer  a1f94dfe0b38c6fe98b68f754389c781f7836b0074cf61eee749ae1c989a218a`
