@@ -1,4 +1,5 @@
 import { Response, Request, NextFunction } from 'express';
+import { logger } from '../config/winston';
 
 export const asyncError = (fn: any) => {
   return function(req: Request, res: Response, next: NextFunction) {
@@ -26,6 +27,11 @@ export const prodError = (
   res: Response,
   next: NextFunction
 ) => {
+  logger.error(
+    `${err.status || 500} - ${err.message} - ${req.originalUrl} - ${
+      req.method
+    } - ${req.ip}`
+  );
   res.status(err.status || 500).json(err.message);
 };
 
