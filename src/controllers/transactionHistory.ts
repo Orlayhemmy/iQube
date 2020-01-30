@@ -12,7 +12,7 @@ function pastWeek(): string[] {
   let getDays = (num: number) =>
     new Date(new Date().setDate(new Date().getDate() - num)).toDateString();
   let last7Days = [];
-  for (let i = 0; i <= 7; i++) {
+  for (let i = 1; i <= 7; i++) {
     last7Days.push(getDays(i));
   }
   return last7Days;
@@ -43,13 +43,13 @@ export const sortHistory = async (req: Request, res: Response) => {
     };
     let response = await rp(options);
     if (response.ResponseCode == '00') {
-      let yesterdaysTransaction = response.Transactions.filter(
+/*       let yesterdaysTransaction = response.Transactions.filter(
         (item: { date: string | number | Date }) => {
           if (yesterday() == new Date(item.date).toDateString()) {
             return item;
           }
         }
-      );
+      ); */
       let todaysTransaction = response.Transactions.filter(
         (item: { date: string | number | Date }) => {
           if (new Date().toDateString() == new Date(item.date).toDateString()) {
@@ -69,7 +69,7 @@ export const sortHistory = async (req: Request, res: Response) => {
       return res.status(200).json({
         status: 200,
         data: {
-          yesterdaysTransaction,
+          // yesterdaysTransaction,
           todaysTransaction,
           pastWeekTransactions
         }
