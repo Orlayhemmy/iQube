@@ -1,8 +1,7 @@
 import * as winston from 'winston';
 import * as path from 'path';
 
-const logPath = path.join(__dirname, '..', 'logs');
-console.log(logPath)
+const logPath = path.join(__dirname, '../..', 'logs');
 
 let options = {
   file: {
