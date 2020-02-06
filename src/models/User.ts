@@ -7,6 +7,7 @@ export interface User extends Document {
   device: [Device['_id']];
   FirstName: string;
   LastName: string;
+  hasDataPolicyChecked: boolean;
 }
 
 const userSchema = new Schema(
@@ -15,7 +16,8 @@ const userSchema = new Schema(
     profilePicture: { type: String, default: '' },
     device: [{ type: Schema.Types.ObjectId, ref: 'Device' }],
     FirstName: { type: String, default: '' },
-    LastName: { type: String, default: '' }
+    LastName: { type: String, default: '' },
+    hasDataPolicyChecked: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
