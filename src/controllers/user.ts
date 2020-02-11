@@ -271,36 +271,19 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    try {
-      const data = {
-        key: 'LhUdxDyJoyw8GL9Qmx35PJKKByWagGCa',
-        platform: req.body.deviceOS ? req.body.deviceOS.toUpperCase() : '',
-        deviceID: req.body.deviceID,
-        userID: req.body.userID,
-        token: req.body.deviceNotificationToken,
-        module: 'mybank'
-      };
-      const options = {
-        method: 'POST',
-        uri: `${notificationServiceUrl}/device/sync`,
-        body: data,
-        json: true,
-        headers: {
-          'content-type': 'application/json'
-        }
-      };
-      let response = await rp(options);
-      await db.Device.findOneAndUpdate(
-        { _id: userDevices._id },
-        { $set: { deviceNotificationToken: req.body.deviceNotificationToken } },
-        { new: true }
-      );
-
-      // update user FirstName and LastName
-      if (req.body.FirstName && req.body.LastName) {
+    // check data policy only when user has not done it
+    if (user && !user.hasDataPolicyChecked) {
+      // check if user has done data policy
+      let dataPolicy = await initiateOTPorCheckDataPolicy(req, dataPolicyUrl);
+      if (dataPolicy.ResponseCode == '70') {
+        return res.status(200).json({
+          status: 201,
+          message: dataPolicy.ResponseFriendlyMessage
+        });
+      } else {
         await db.User.findOneAndUpdate(
-          { userID: req.body.userID },
-          { FirstName: req.body.FirstName, LastName: req.body.LastName }
+          { _id: user._id },
+          { hasDataPolicyChecked: true }
         );
       }
     } catch (e) {
