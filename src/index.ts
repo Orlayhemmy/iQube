@@ -17,6 +17,8 @@ const app = express();
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
+import './middleware/notificationEmitter'
+
 app.use('/api-docs', SwaggerUI.serve, SwaggerUI.setup(SwaggerDoc));
 app.use(helmet());
 app.use(express.json({ limit: '10mb' }));
