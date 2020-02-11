@@ -7,8 +7,11 @@ const baseUrl = `https://ibankingpilot.stanbicibtcbank.com/api`;
 const initiateOTPUrl = `${baseUrl}/UserProfileManagement/InitiateOTPRequest`;
 const dataPolicyUrl = `${baseUrl}/UserProfileManagement/ConfirmIfUserDataPrivacyExist`;
 const initiateDeviceBindingOTPURL = `${baseUrl}/UserProfileManagement/InitiateDeviceBindingOTP`;
-const notificationServiceUrl = `https://stanbic-pushnotification.nibse.com`;
 const validateOTPURL = `${baseUrl}/UserProfileManagement/ValidateDeviceBindingOTP`;
+
+import * as EventEmitter from 'events';
+class MyEmitter extends EventEmitter {}
+export const notificationEmitter = new MyEmitter();
 
 async function initiateOTPorCheckDataPolicy(req: Request, url: string) {
   let data: any = {
@@ -210,22 +213,6 @@ export const login = async (req: Request, res: Response) => {
     // first find user. if no user, they've not binded
     const user = await db.User.findOne({ userID: req.body.userID });
 
-    // check data policy only when user has not done it
-    if (user && !user.hasDataPolicyChecked) {
-      // check if user has done data policy
-      let dataPolicy = await initiateOTPorCheckDataPolicy(req, dataPolicyUrl);
-      if (dataPolicy.ResponseCode == '70') {
-        return res
-          .status(200)
-          .json({ status: 201, message: dataPolicy.ResponseFriendlyMessage });
-      } else {
-        await db.User.findOneAndUpdate(
-          { _id: user._id },
-          { hasDataPolicyChecked: true }
-        );
-      }
-    }
-
     if (!user) {
       // initiate otp
       let response = await initiateOTPorCheckDataPolicy(
@@ -286,35 +273,29 @@ export const login = async (req: Request, res: Response) => {
           { hasDataPolicyChecked: true }
         );
       }
-    } catch (e) {
-      console.log('device notification error', e);
-    }
-    let isFirstLogin: boolean = false;
-    let firstLoginDate: Date = new Date();
-    // check if it's first login
-    let firstLoginExists = await db.Log.findOne({
-      userID: req.body.userID,
-      isFirstLogin: true
-    });
-    if (!firstLoginExists) {
-      isFirstLogin = true;
-    } else {
-      firstLoginDate = firstLoginExists.firstLoginDate;
     }
 
-    const log = await db.Log.create({
-      userID: req.body.userID,
-      device: userDevices._id,
-      status: 'successful',
-      isFirstLogin,
-      firstLoginDate,
-      lastLoginDate: new Date()
-    });
+    let platform = req.body.deviceOS ? req.body.deviceOS.toUpperCase() : '';
+    let module = 'mybank';
+    let FirstName = req.body.FirstName;
+    let LastName = req.body.LastName;
+    let userDeviceID = userDevices._id;
+
+    notificationEmitter.emit(
+      'notification',
+      platform,
+      req.body.deviceID,
+      req.body.userID,
+      req.body.deviceNotificationToken,
+      module,
+      FirstName,
+      LastName,
+      userDeviceID
+    );
 
     return res.status(200).json({
       status: 200,
-      message: `user device already successfully binded`,
-      log
+      message: `user device already successfully binded`
     });
   } catch (e) {
     if (e.statusCode)
