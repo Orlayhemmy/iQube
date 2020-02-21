@@ -213,7 +213,7 @@ export const login = async (req: Request, res: Response) => {
     // first find user. if no user, they've not binded
     const user = await db.User.findOne({ userID: req.body.userID });
 
-    if (!user) {
+    /*     if (!user) {
       // initiate otp
       let response = await initiateOTPorCheckDataPolicy(
         req,
@@ -225,13 +225,14 @@ export const login = async (req: Request, res: Response) => {
           req,
           initiateDeviceBindingOTPURL
         );
-      }
+      } */
+    if (!user) {
       return res.status(200).json({
         status: 202,
-        message: `An otp has been sent to you for device binding`,
-        Reference: response.ResponseDescription
+        message: `An otp has been sent to you for device binding`
       });
     }
+
     const userDevices = await db.Device.findOne({
       user: user._id,
       deviceID: req.body.deviceID,
