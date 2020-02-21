@@ -7,7 +7,7 @@ const baseUrl = `https://ibankingpilot.stanbicibtcbank.com/api`;
 const initiateOTPUrl = `${baseUrl}/UserProfileManagement/InitiateOTPRequest`;
 const dataPolicyUrl = `${baseUrl}/UserProfileManagement/ConfirmIfUserDataPrivacyExist`;
 const initiateDeviceBindingOTPURL = `${baseUrl}/UserProfileManagement/InitiateDeviceBindingOTP`;
-const validateOTPURL = `${baseUrl}/UserProfileManagement/ValidateDeviceBindingOTP`;
+const validateOTPURL = `${baseUrl}/UserProfileManagement/ValidateAuthOTPRequest`;
 
 import * as EventEmitter from 'events';
 class MyEmitter extends EventEmitter {}
