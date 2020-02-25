@@ -34,6 +34,7 @@ notificationEmitter.on(
         }
       };
       let response = await rp(options);
+      console.log('response from device/sync', response)
       await db.Device.findOneAndUpdate(
         { _id: userDeviceID },
         {
