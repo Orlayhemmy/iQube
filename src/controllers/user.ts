@@ -134,8 +134,8 @@ export const deviceBinding = async (req: Request, res: Response) => {
 
       if (devices.length && devices.length >= 5) {
         return res.status(400).json({
-          status: 400,
-          message: `You already have 5 profiles bounded to this device, please unbind one to add this`
+          status: 405,
+          message: `You already have 5 profiles linked to this device, please unbind one to add this`
         });
       }
 
@@ -182,8 +182,8 @@ export const deviceBinding = async (req: Request, res: Response) => {
         });
       }
       return res.status(400).json({
-        status: 400,
-        message: `You already have 5 devices bounded to this account, please unlink one to add this`
+        status: 405,
+        message: `You already have 5 devices linked to this profile, please unlink one to add this`
       });
     }
     return res
