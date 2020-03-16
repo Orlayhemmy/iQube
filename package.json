@@ -13,7 +13,7 @@
     "build": "npm run build-ts",
     "dev": "npm run watch",
     "start": "npm run build-ts && npm run serve",
-    "pm2": "pm2 start npm -- start"
+    "pm2": "pm2 start --name profile npm -- start"
   },
   "repository": {
     "type": "git",
