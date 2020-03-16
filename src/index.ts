@@ -17,6 +17,10 @@ const app = express();
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
+app.get('/', (req, res) => {
+  return res.json('profile management')
+})
+
 import './middleware/notificationEmitter'
 
 app.use('/api-docs', SwaggerUI.serve, SwaggerUI.setup(SwaggerDoc));
