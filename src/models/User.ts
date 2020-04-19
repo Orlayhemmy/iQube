@@ -8,6 +8,8 @@ export interface User extends Document {
   FirstName: string;
   LastName: string;
   hasDataPolicyChecked: boolean;
+  firstLoginDate: Date; // first login date
+  lastLoginDate: Date;
 }
 
 const userSchema = new Schema(
@@ -17,7 +19,9 @@ const userSchema = new Schema(
     device: [{ type: Schema.Types.ObjectId, ref: 'Device' }],
     FirstName: { type: String, default: '' },
     LastName: { type: String, default: '' },
-    hasDataPolicyChecked: { type: Boolean, default: false }
+    hasDataPolicyChecked: { type: Boolean, default: false },
+    firstLoginDate: Date,
+    lastLoginDate: Date,
   },
   { timestamps: true }
 );
