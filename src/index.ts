@@ -37,7 +37,7 @@ app.use('/api', router);
 app.use(notFound);
 app.use(prodError);
 
-const port = process.env.PORT || 5050;
+const port = process.env.PORT || 6060;
 
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
