@@ -1,12 +1,5 @@
 import { Request, Response } from 'express';
 import * as db from '../models';
-import { validator } from '../errorhandler/errorhandler';
-import * as tinify from 'tinify';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as cryto from 'crypto';
-tinify.key = 'xSybnjt81B9BGySlpTbjzmFkkRmst1XC';
-import { UploadedFile } from 'express-fileupload';
 
 
 export const fetchAdvert = async (req: Request, res: Response) => {
