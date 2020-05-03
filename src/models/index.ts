@@ -8,14 +8,14 @@ const options = {
   keepAlive: true,
   useNewUrlParser: true,
   useFindAndModify: false,
-  useCreateIndex: true
+  useCreateIndex: true,
 };
 
 mongoose.connect(`${process.env.MONGO_URI_STAGING}`, options);
 
-mongoose.set('debug', true)
+mongoose.set('debug', true);
 
-mongoose.connection.on('err', err => {
+mongoose.connection.on('err', (err) => {
   console.error(console.error(`🙅 🚫 🙅 🚫 🙅 🚫 🙅 🚫 → ${err.message}`));
 });
 
@@ -26,3 +26,4 @@ export { default as Beneficiary } from './Beneficiary';
 export { default as AtEaseUser } from './@EaseProfile';
 export { default as Advert } from './Advert';
 export { default as AtEaseDevice } from './@EaseDevice';
+export { default as Message } from './PushMessages';
