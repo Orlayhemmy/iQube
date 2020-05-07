@@ -7,25 +7,7 @@ notificationEmitter.on(
   'notification',
   async (platform, deviceID, userID, token, module, FirstName, LastName, userDeviceID) => {
     try {
-      const data = {
-        key: 'LhUdxDyJoyw8GL9Qmx35PJKKByWagGCa',
-        platform,
-        deviceID,
-        userID,
-        token,
-        module,
-      };
-      const options = {
-        method: 'POST',
-        uri: `${notificationServiceUrl}/device/sync`,
-        body: data,
-        json: true,
-        headers: {
-          'content-type': 'application/json',
-        },
-      };
-      let response = await rp(options);
-      console.log('response from device/sync', response);
+
       await db.Device.findOneAndUpdate(
         { _id: userDeviceID },
         {
