@@ -30,7 +30,8 @@ async function initiateOTPorCheckDataPolicy(req: Request, url: string) {
     headers: {
       'content-type': 'application/json',
       'X-STC-AGENT-CACHE': req.body.userID,
-      Authorization: `Bearer ${req.body.Token}`
+      Authorization: `Bearer ${req.body.Token}`,
+      XMB: 1,
     }
   };
   return await rp(options);
@@ -51,8 +52,9 @@ async function validateDeviceBindingOTP(req: Request, url: string) {
     headers: {
       'content-type': 'application/json',
       'X-STC-AGENT-CACHE': req.body.userID,
-      Authorization: `Bearer ${req.body.Token}`
-    }
+      Authorization: `Bearer ${req.body.Token}`,
+      XMB: 1,
+    },
   };
   return await rp(options);
 }
