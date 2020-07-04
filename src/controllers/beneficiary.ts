@@ -4,7 +4,7 @@ import { randomBytes } from 'crypto';
 import { validator } from '../errorhandler/errorhandler';
 import * as db from '../models';
 // let baseUrl = `https://stanbic.nibse.com/mybank/api`;
-const baseUrl = `https://ibankingpilot.stanbicibtcbank.com/api`;
+const baseUrl = `https://mobile.stanbicibtc.com/api`;
 const editBeneficiaryURl = `${baseUrl}/BeneficiaryManagement/EditBeneficiary`;
 const fetchBeneficiaryUrl = `${baseUrl}/BeneficiaryManagement/GetBeneficiaryList`;
 const addBeneficiaryUrl = `${baseUrl}/BeneficiaryManagement/AddBeneficiary`;

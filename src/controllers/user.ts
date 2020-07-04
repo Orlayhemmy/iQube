@@ -3,7 +3,7 @@ import * as db from '../models';
 import { validator } from '../errorhandler/errorhandler';
 import * as rp from 'request-promise-native';
 // const baseUrl = `https://stanbic.nibse.com/mybank/api`;
-const baseUrl = `https://ibankingpilot.stanbicibtcbank.com/api`;
+const baseUrl = `https://mobile.stanbicibtc.com/api`;
 const initiateOTPUrl = `${baseUrl}/UserProfileManagement/InitiateOTPRequest`;
 const dataPolicyUrl = `${baseUrl}/UserProfileManagement/ConfirmIfUserDataPrivacyExist`;
 const initiateDeviceBindingOTPURL = `${baseUrl}/UserProfileManagement/InitiateDeviceBindingOTP`;

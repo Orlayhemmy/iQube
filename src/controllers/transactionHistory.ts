@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as rp from 'request-promise-native';
 import { validator } from '../errorhandler/errorhandler';
-const baseUrl = `https://ibankingpilot.stanbicibtcbank.com/api`;
+const baseUrl = `https://mobile.stanbicibtc.com/api`;
 const historyUrl =
   `${baseUrl}/TransactionManagement/GetTransactionDetailsByAccountNumberAndCount`;
 
