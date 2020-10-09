@@ -77,11 +77,13 @@ export const sortHistory = async (req: Request, res: Response) => {
     }
     return res.status(400).json({
       status: response.ResponseCode,
-      message: response.ResponseDescription
+    //   message: response.ResponseDescription
+      message: ''
     });
   } catch (e) {
-    return res
+      console.log('error', e)
+/*     return res
       .status(e.statusCode)
-      .json({ status: e.statusCode, message: e.message });
+      .json({ status: e.statusCode, message: e.message }); */
   }
 };
