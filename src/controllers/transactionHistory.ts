@@ -85,5 +85,8 @@ export const sortHistory = async (req: Request, res: Response) => {
 /*     return res
       .status(e.statusCode)
       .json({ status: e.statusCode, message: e.message }); */
+     return res
+      .status(e.statusCode)
+      .json({ status: e.statusCode, message: '' });
   }
 };
