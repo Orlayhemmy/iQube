@@ -32,7 +32,7 @@ router.route('/mybank/addprofile').post(asyncError(user.addOrUpdateProfileImage)
 
 router.route('/mybank/viewprofile').post(asyncError(user.fetchImage));
 
-router.route('/admin/advert').get(asyncError(advertController.fetchAllAdverts));
+router.route('/admin/advert').get(asyncError(advertController.fetchAllActiveAdverts));
 
 router.route('/admin/advert/:id').get(asyncError(advertController.fetchAdvert));
 
