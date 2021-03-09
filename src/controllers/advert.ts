@@ -7,7 +7,8 @@ export const fetchAdvert = async (req: Request, res: Response) => {
   return res.status(200).json({ status: 200, data: advert });
 };
 
-export const fetchAllAdverts = async (req: Request, res: Response) => {
-  const adverts = await db.Advert.find({}).sort({ index: 1 });
+export const fetchAllActiveAdverts = async (req: Request, res: Response) => {
+  const adverts = await db.Advert.find({ approved: true, status: true }).sort({ index: 1 });
+  
   return res.status(200).json({ status: 200, data: adverts });
 };
