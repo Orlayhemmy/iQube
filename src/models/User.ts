@@ -22,6 +22,7 @@ const userSchema = new Schema(
     hasDataPolicyChecked: { type: Boolean, default: false },
     firstLoginDate: Date,
     lastLoginDate: Date,
+    groups: [{ type: Schema.Types.ObjectId }],
   },
   { timestamps: true }
 );
