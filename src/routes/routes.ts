@@ -6,13 +6,17 @@ import * as beneficiaryController from '../controllers/beneficiary';
 import * as advertController from '../controllers/advert';
 import * as atEaseUser from '../controllers/@easesUser';
 import * as Push from '../controllers/push';
+import { deviceBindingValidation, loginValidation, unlinkDeviceValidation } from '../validation/validations';
 const router = Router();
 
-router.route('/device/binding').post(asyncError(user.deviceBinding));
+router.route('/device/binding/old').post(asyncError(user.deviceBinding));
+router.route('/device/binding').post(deviceBindingValidation, asyncError(user.deviceBindingAction));
 router.route('/login/logs').post(asyncError(user.login));
+router.route('/login').post(loginValidation, asyncError(user.loginAction));
 router.route('/transaction/history').post(asyncError(transaction.sortHistory));
 router.route('/device/all').post(asyncError(user.viewAllBindedDevices));
-router.route('/device/unlink').post(asyncError(user.unlinkDevice));
+router.route('/device/unlink/old').post(asyncError(user.unlinkDevice));
+router.route('/device/unlink').post(unlinkDeviceValidation, asyncError(user.unlinkDeviceAction));
 router.route('/device/sendotp').post(asyncError(user.sendOTPforUnLinkDevice));
 
 router.route('/atease/device/login').post(asyncError(atEaseUser.login));

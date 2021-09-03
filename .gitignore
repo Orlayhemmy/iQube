@@ -2,3 +2,4 @@ node_modules
 application.env
 /dist
 /logs
+.vs/

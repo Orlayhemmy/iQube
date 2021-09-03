@@ -408,3 +408,209 @@ export const unlinkDevice = async (req: Request, res: Response) => {
     return res.status(400).json({ status: 400, message: e.message });
   }
 };
+
+/* 
+  when a user logs in we first check that the device they're logging in
+  with is binded, if not, we tell them to bind
+*/
+export const loginAction = async (req: Request, res: Response) => {
+    try {
+        // first find user. if no user, they've not binded
+        const user = await db.User.findOne({ userID: req.body.userID });
+
+        // a new user needs device binding
+        if (!user) {
+            return res.status(202).json({
+                status: 202,
+                message: `An otp has been sent to you for device binding`
+            });
+        }
+
+        const { deviceID, userID, CifId, Token, type, deviceOS, deviceName } = req.body
+
+        // check the new device table for the device info
+        let userDevice = await db.UserDevice.findOne({
+            deviceID: req.body.deviceID,
+        });
+
+        if (userDevice) {
+            // check that the type of user logging in exists in the device info
+            if (userDevice.user[type]) {
+                // check the user logging in to ensure its the registered user
+                if (userDevice.user[type] = user._id) {
+                    // log the user in
+                    return res.status(200).json({
+                        status: 200,
+                         message: 'Welcome back!'
+                    })
+                } else {
+                    return res.status(202).json({
+                        status: 202,
+                        message: 'You need to bind this device to continue!'
+                    });
+                }
+            }
+            // the type of user logging in is not binded to this device so it needs to bind
+            return res.status(200).json({
+               status: 202,
+                message: 'You need to bind this device to continue!'
+            });
+
+        }
+
+        // find the user device in the old table since its not in the new table
+ 
+        if (userDevice) {
+            // copy userDevice info into the the new table
+            const device = await db.UserDevice.create({
+                deviceID,
+                deviceName,
+                deviceOS,
+                user: {
+                    [type]: user._id
+                }
+            })
+
+            user.devices = user.devices.push(device._id)
+            user.save()
+
+            // log user in after successfully copy
+            return res.status(200).json({
+                status: 200,
+                message: 'Welcome back!'
+            })
+        }
+
+        // if userDevice can't be found on the old table still, tell user to bind
+        return res.status(202).json({
+            status: 202,
+            message: 'You need to bind this device to continue!'
+        });
+
+    } catch (e) {
+        return res.status(500).json({
+            status: 500,
+            message: 'An error ocurred!'
+        });
+    }
+};
+
+export const deviceBindingAction = async (req: Request, res: Response) => {
+    try {
+        const { deviceID, userID, CifId, Token, type, deviceOS, deviceName } = req.body
+
+        // validate otp
+        let response = await validateDeviceBindingOTP(req, validateOTPURL);
+
+        if (response.ResponseCode == '00') {
+            // find if user exists already
+            let user = await db.User.findOne({ userID });
+            if (!user) {
+                // create user
+                user = await db.User.create({
+                    userID,
+                    FirstName: req.body.FirstName,
+                    LastName: req.body.LastName
+                });
+            }
+
+            // check that device is not binded to another user of the same type yet
+            let device = await db.UserDevice.find({
+                deviceID: req.body.deviceID,
+            });
+
+            if (device) {
+                // the device is binded to another user, unlink it first
+                if (device.user[type]) {
+                    return res.status(400).json({
+                        status: 405,
+                        message: `You already have a profile linked to this device, please unbind it to add this`
+                    });
+                }
+
+                // device is not binded to any user, bind it
+                device.user[type] = user._id
+                device.save()
+
+                user.devices = user.devices.push(device._id)
+                user.save()
+            } else {
+                // device doesn't exist, so create and bind it
+                device = await db.UserDevice.create({
+                    deviceID,
+                    deviceName,
+                    deviceOS,
+                    user: {
+                        [type]: user._id
+                    }
+                })
+
+                user.devices = user.devices.push(device._id)
+                user.save()
+            }
+        }
+        return res
+            .status(500)
+            .json({ status: 500, message: `Unable to validate OTP` });
+    } catch (e) {
+        if (e.statusCode)
+            return res
+                .status(e.statusCode)
+                .json({ status: e.statusCode, message: e.message });
+        return res.status(500).json({ status: 500, message: e.message });
+    }
+};
+
+export const unlinkDeviceAction = async (req: Request, res: Response) => {
+    try {
+        const { deviceID, userID, CifId, Token, type, deviceOS, deviceName } = req.body
+
+        let response = await validateDeviceBindingOTP(req, validateOTPURL);
+
+        if (response.ResponseCode == '00') {
+            // find device and update status
+            const user = await db.User.findOne({ userID: req.body.userID });
+            if (user) {
+                const device = await db.UserDevice.findOne({
+                    deviceID: req.body.deviceID,
+                    user: {
+                        [type]: user._id
+                    }
+                });
+                if (!device)
+                    return res.status(400).json({
+                        status: 400,
+                        message: `Could not unlink Device because it is not currently linked`
+                    });
+
+                // unlink device from device account
+                device.user[type] = null
+                device.save()
+
+                // unlink device from user's profile
+                await db.User.findOneAndUpdate(
+                    { _id: user._id },
+                    { $pull: { devices: device._id } },
+                    { new: true }
+                );
+                return res
+                    .status(200)
+                    .json({ status: 200, message: 'Device successfully unlinked' });
+            }
+            return res.status(400).json({
+                status: 400,
+                message: `Could not unlink Device because it is not currently linked`
+            });
+        }
+        return res.status(400).json({
+            status: 400,
+            message: `Could not validate OTP`
+        });
+    } catch (e) {
+        if (e.statusCode)
+            return res
+                .status(e.statusCode)
+                .json({ status: e.statusCode, message: e.message });
+        return res.status(400).json({ status: 400, message: e.message });
+    }
+};
