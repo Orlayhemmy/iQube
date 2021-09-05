@@ -1,7 +1,7 @@
-import { Request, Response, Next } from 'express'
+import { Request, Response } from 'express'
 import { validator } from '../errorhandler/errorhandler'
 
-export const loginValidation = (req: Request, res: Response, next: Next) => {
+export const loginValidation = (req: Request, res: Response, next: any) => {
     let inputs = ['deviceID', 'userID', 'CifId', 'Token', 'type']
     let err = validator(inputs, req.body)
     if (err.length >= 1)
@@ -9,7 +9,7 @@ export const loginValidation = (req: Request, res: Response, next: Next) => {
     next()
 }
 
-export const deviceBindingValidation = (req: Request, res: Response, next: Next) => {
+export const deviceBindingValidation = (req: Request, res: Response, next: any) => {
     let inputs = [
         'deviceName',
         'deviceID',
@@ -26,7 +26,7 @@ export const deviceBindingValidation = (req: Request, res: Response, next: Next)
     next()
 }
 
-export const unlinkDeviceValidation = (req: Request, res: Response, next: Next) => {
+export const unlinkDeviceValidation = (req: Request, res: Response, next: any) => {
     let inputs = ['deviceID', 'Otp', 'Reference', 'userID', 'Token', 'type'];
     let err = validator(inputs, req.body);
     if (err.length >= 1)

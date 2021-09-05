@@ -4,8 +4,7 @@ export interface UserDevice extends Document {
     deviceID: string;
     deviceName: string;
     deviceOS: string;
-    userID: object;
-    isUnlinked: boolean;
+    user: any;
     deviceNotificationToken: string;
 }
 

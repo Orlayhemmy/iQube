@@ -1,6 +1,5 @@
 import * as mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
-dotenv.config({ path: 'application.env' });
 
 const options = {
   reconnectTries: Number.MAX_VALUE,

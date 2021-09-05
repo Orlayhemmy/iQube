@@ -437,7 +437,7 @@ export const loginAction = async (req: Request, res: Response) => {
             // check that the type of user logging in exists in the device info
             if (userDevice.user[type]) {
                 // check the user logging in to ensure its the registered user
-                if (userDevice.user[type] = user._id) {
+                if (JSON.stringify(userDevice.user[type]) === JSON.stringify(user._id)) {
                     // log the user in
                     return res.status(200).json({
                         status: 200,
@@ -451,7 +451,7 @@ export const loginAction = async (req: Request, res: Response) => {
                 }
             }
             // the type of user logging in is not binded to this device so it needs to bind
-            return res.status(200).json({
+            return res.status(202).json({
                status: 202,
                 message: 'You need to bind this device to continue!'
             });
@@ -459,10 +459,14 @@ export const loginAction = async (req: Request, res: Response) => {
         }
 
         // find the user device in the old table since its not in the new table
- 
-        if (userDevice) {
+        let device = await db.Device.findOne({
+            deviceID: req.body.deviceID,
+            user: user._id
+        });
+
+        if (device) {
             // copy userDevice info into the the new table
-            const device = await db.UserDevice.create({
+            const newDevice = await db.UserDevice.create({
                 deviceID,
                 deviceName,
                 deviceOS,
@@ -471,7 +475,7 @@ export const loginAction = async (req: Request, res: Response) => {
                 }
             })
 
-            user.devices = user.devices.push(device._id)
+            user.devices.push(newDevice._id)
             user.save()
 
             // log user in after successfully copy
@@ -500,9 +504,10 @@ export const deviceBindingAction = async (req: Request, res: Response) => {
         const { deviceID, userID, CifId, Token, type, deviceOS, deviceName } = req.body
 
         // validate otp
-        let response = await validateDeviceBindingOTP(req, validateOTPURL);
+        // let response = await validateDeviceBindingOTP(req, validateOTPURL);
 
-        if (response.ResponseCode == '00') {
+        if (true) {
+
             // find if user exists already
             let user = await db.User.findOne({ userID });
             if (!user) {
@@ -515,7 +520,7 @@ export const deviceBindingAction = async (req: Request, res: Response) => {
             }
 
             // check that device is not binded to another user of the same type yet
-            let device = await db.UserDevice.find({
+            let device = await db.UserDevice.findOne({
                 deviceID: req.body.deviceID,
             });
 
@@ -523,7 +528,7 @@ export const deviceBindingAction = async (req: Request, res: Response) => {
                 // the device is binded to another user, unlink it first
                 if (device.user[type]) {
                     return res.status(400).json({
-                        status: 405,
+                        status: 400,
                         message: `You already have a profile linked to this device, please unbind it to add this`
                     });
                 }
@@ -532,11 +537,11 @@ export const deviceBindingAction = async (req: Request, res: Response) => {
                 device.user[type] = user._id
                 device.save()
 
-                user.devices = user.devices.push(device._id)
+                user.devices.push(device._id)
                 user.save()
             } else {
                 // device doesn't exist, so create and bind it
-                device = await db.UserDevice.create({
+                const device = await db.UserDevice.create({
                     deviceID,
                     deviceName,
                     deviceOS,
@@ -545,13 +550,13 @@ export const deviceBindingAction = async (req: Request, res: Response) => {
                     }
                 })
 
-                user.devices = user.devices.push(device._id)
+                user.devices.push(device._id)
                 user.save()
             }
+
+            return res.status(200).json({ status: 200, message: 'device binding was successful' })
         }
-        return res
-            .status(500)
-            .json({ status: 500, message: `Unable to validate OTP` });
+        return res.status(500).json({ status: 500, message: `Unable to validate OTP` });
     } catch (e) {
         if (e.statusCode)
             return res

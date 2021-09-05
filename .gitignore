@@ -3,3 +3,4 @@ application.env
 /dist
 /logs
 .vs/
+package-lock.json
